@@ -26,12 +26,13 @@ func NewVector(begin, end Pointable) Vector {
 }
 
 func (v Vector) ToPolar() PolarVector {
-	w, h := v.End.X-v.Begin.X, v.End.Y-v.Begin.Y
-	l := math.Sqrt(w*w + h*h)
+	// In trigonometry Y axis is directed up. In svg it is directed down
+	// Hence the inversion of h.
+	w, h := v.End.X-v.Begin.X, v.Begin.Y-v.End.Y
 	return PolarVector{
 		Begin:  v.Begin,
-		Angle:  math.Atan2(h/l, w/l),
-		Length: l,
+		Angle:  math.Atan2(h, w),
+		Length: math.Sqrt(w*w + h*h),
 	}
 }
 
@@ -42,7 +43,7 @@ func (pv PolarVector) PointAtOffset(offset float64) Point {
 func (pv PolarVector) PointAtLength(l float64) Point {
 	return Point{
 		X: pv.Begin.X + math.Cos(pv.Angle)*l,
-		Y: pv.Begin.Y + math.Sin(pv.Angle)*l,
+		Y: pv.Begin.Y - math.Sin(pv.Angle)*l,
 	}
 }
 

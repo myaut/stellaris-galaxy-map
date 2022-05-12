@@ -1,3 +1,5 @@
+github.com/YashdalfTheGray/colorcode v0.0.0-20220426055847-eb9bb00e9fbe h1:KUeyL5F8h55PBao+jN/xEozyD+MWTxxEGb1Byz3e2XY=
+github.com/YashdalfTheGray/colorcode v0.0.0-20220426055847-eb9bb00e9fbe/go.mod h1:Al6uJLDwrBmBUWStrv3BmKgt4rcUAoOM+mnUPdVQR3s=
 github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
 github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=

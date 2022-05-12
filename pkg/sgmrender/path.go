@@ -7,6 +7,24 @@ import (
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
 )
 
+var (
+	defaultStarPath = NewPath().
+			MoveTo(-starSize, 0.0).LineTo(0.0, starSize).
+			LineTo(starSize, 0.0).LineTo(0.0, -starSize).
+			Complete()
+
+	outpostPath      = newStarbasePath(outpostSize)
+	starbasePath     = newStarbasePath(starbaseSize)
+	citadelInnerPath = newStarbasePath(starbaseSize / 2)
+)
+
+func newStarbasePath(size float64) Path {
+	return NewPath().
+		MoveTo(-size, 0.0).LineTo(-size/2, 5*size/6).HorLine(size/2).
+		LineTo(size, 0.0).LineTo(size/2, -5*size/6).HorLine(-size / 2).
+		Complete()
+}
+
 type PathElement struct {
 	Command rune
 	X, Y    float64

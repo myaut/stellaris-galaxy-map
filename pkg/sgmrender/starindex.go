@@ -1,6 +1,8 @@
 package sgmrender
 
 import (
+	"log"
+	"math"
 	"sort"
 
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
@@ -86,6 +88,9 @@ func (r *Renderer) buildStarIndex() {
 					continue
 				}
 
+				if traceFlags&traceFlagStarIndex != 0 {
+					log.Printf("AdjNode: %s -> %s (angle: %f)\n", star.Name, adjStar.Name, pv.Angle)
+				}
 				adjList = append(adjList, StarAdjacency{
 					AdjStarId: adjStarId,
 					AdjStar:   adjStar,
@@ -96,4 +101,48 @@ func (r *Renderer) buildStarIndex() {
 		sort.Sort(adjList)
 		r.starGeoIndex[starId] = adjList
 	}
+}
+
+//
+// Returns quadrants: I - 0, II - 1, III - -2, IV - -1
+func (r *Renderer) pickTextQuadrant(starId sgm.StarId) int {
+	quadrantWeight := make([]float64, 4)
+	for _, adjNode := range r.starGeoIndex[starId] {
+		quadrant := (2 + int(math.Floor(2.0*adjNode.Vector.Angle/math.Pi))) % 4
+		weight := 0.1
+
+		// Nodes with pops/starbases produce large icon sets with texts
+		// that we're trying to avoid
+		if adjNode.AdjStar.HasPops() {
+			weight += 1.0
+		}
+		if adjNode.AdjStar.HasSignificatMegastructures() {
+			weight += 1.0
+		}
+		if adjNode.AdjStar.HasUpgradedStarbase() {
+			weight += 2.0
+		}
+
+		points := weight / (adjNode.Vector.Length * adjNode.Vector.Length)
+		quadrantWeight[quadrant] += points
+
+		// If too close to the quadrant's edge, account to neighboring qudrant too
+		if math.Abs(math.Sin(adjNode.Vector.Angle)) < 0.2 {
+			quadrantWeight[3-quadrant] += points
+		}
+
+	}
+
+	minQuadrant, minWeight := -1, 0.0
+	for quadrant, weight := range quadrantWeight {
+		if minQuadrant == -1 || weight < minWeight {
+			minQuadrant, minWeight = quadrant, weight
+		}
+	}
+
+	if traceFlags&traceFlagStarIndex != 0 {
+		log.Printf("TextQuadrant: %s - %v -> %v\n", r.state.Stars[starId].Name,
+			quadrantWeight, minQuadrant-2)
+	}
+	return minQuadrant - 2
 }

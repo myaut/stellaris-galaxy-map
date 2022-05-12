@@ -27,21 +27,30 @@ func WrapParserError(elem string, innerErr error) error {
 }
 
 type Parser struct {
-	ch chan Token
+	tokenizer *Tokenizer
 }
 
-func NewParser(ch chan Token) *Parser {
+func NewParser(tokenizer *Tokenizer) *Parser {
 	return &Parser{
-		ch: ch,
+		tokenizer: tokenizer,
 	}
 }
 
 func (p *Parser) Parse(v interface{}) error {
-	return p.parseStruct(TokenTypeUndefined, reflect.ValueOf(v).Elem())
+	var tokenizerErr error
+	go func() {
+		tokenizerErr = p.tokenizer.Run()
+	}()
+
+	err := p.parseStruct(TokenTypeUndefined, reflect.ValueOf(v).Elem())
+	if tokenizerErr != nil {
+		return tokenizerErr
+	}
+	return err
 }
 
 func (p *Parser) ignoreComplexValue() {
-	for token := range p.ch {
+	for token := range p.tokenizer.C {
 		switch token.Type {
 		case TokenCollectionStart:
 			p.ignoreComplexValue()
@@ -55,7 +64,7 @@ func (p *Parser) parseMap(v reflect.Value) error {
 	v.Set(reflect.MakeMap(v.Type()))
 
 	keyType, valueType := v.Type().Key(), v.Type().Elem()
-	for token := range p.ch {
+	for token := range p.tokenizer.C {
 		if token.Type == TokenCollectionEnd {
 			return nil
 		}
@@ -65,12 +74,12 @@ func (p *Parser) parseMap(v reflect.Value) error {
 			return err
 		}
 
-		eqToken := <-p.ch
+		eqToken := <-p.tokenizer.C
 		if err := p.ensureToken(eqToken, TokenEqualSign); err != nil {
 			return err
 		}
 
-		valueToken := <-p.ch
+		valueToken := <-p.tokenizer.C
 
 		var (
 			value    reflect.Value
@@ -98,7 +107,7 @@ func (p *Parser) parseMap(v reflect.Value) error {
 	return nil
 }
 
-func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error {
+func (p *Parser) getFields(v reflect.Value) map[string]reflect.Value {
 	fields := make(map[string]reflect.Value)
 	for fieldIdx := 0; fieldIdx < v.NumField(); fieldIdx++ {
 		fieldDef := v.Type().Field(fieldIdx)
@@ -106,8 +115,12 @@ func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error
 			fields[tag] = v.Field(fieldIdx)
 		}
 	}
+	return fields
+}
 
-	for token := range p.ch {
+func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error {
+	fields := p.getFields(v)
+	for token := range p.tokenizer.C {
 		if token.Type == terminalTokenType {
 			return nil
 		}
@@ -115,12 +128,12 @@ func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error
 			return err
 		}
 
-		eqToken := <-p.ch
+		eqToken := <-p.tokenizer.C
 		if err := p.ensureToken(eqToken, TokenEqualSign); err != nil {
 			return err
 		}
 
-		valueToken := <-p.ch
+		valueToken := <-p.tokenizer.C
 		field, hasField := fields[token.Value]
 		if !hasField {
 			if valueToken.Type == TokenCollectionStart {
@@ -192,7 +205,7 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 	case reflect.Map:
 		return p.parseMap(v)
 	case reflect.Slice:
-		for elToken := range p.ch {
+		for elToken := range p.tokenizer.C {
 			if elToken.Type == TokenCollectionEnd {
 				break
 			}
@@ -205,6 +218,14 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 			v.Set(reflect.Append(v, el))
 		}
 	case reflect.Struct:
+		if valueToken.Type == TokenIdentifier {
+			fields := p.getFields(v)
+			if field, fieldOk := fields[valueToken.Value]; fieldOk {
+				nextToken := <-p.tokenizer.C
+				return p.parseValue(nextToken, field)
+			}
+		}
+
 		if err := p.ensureToken(valueToken, TokenCollectionStart); err != nil {
 			return err
 		}

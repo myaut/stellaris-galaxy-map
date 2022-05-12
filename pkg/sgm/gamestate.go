@@ -38,16 +38,8 @@ func LoadGameState(path string) (*GameState, error) {
 		return nil, fmt.Errorf("error loading gamestate from sav file: %w", err)
 	}
 
-	tokenizer := sgmparser.NewTokenizer(stateFile)
-	go func() {
-		tokenizerErr := tokenizer.Run()
-		if tokenizerErr != nil {
-			log.Printf("Error in tokenizer: %s", tokenizerErr)
-		}
-	}()
-
 	state := &GameState{}
-	parser := sgmparser.NewParser(tokenizer.C)
+	parser := sgmparser.NewParser(sgmparser.NewTokenizer(stateFile))
 	err = parser.Parse(state)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing gamestate from sav file: %w", err)

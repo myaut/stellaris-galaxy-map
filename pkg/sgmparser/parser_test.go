@@ -45,14 +45,8 @@ func TestTokenizer(t *testing.T) {
 }
 
 func TestParser(t *testing.T) {
-	var tokenizerErr error
-	tokenizer := NewTokenizer(bytes.NewBufferString(simpleObject))
-	go func() {
-		tokenizerErr = tokenizer.Run()
-	}()
-
 	var value simpleState
-	parser := NewParser(tokenizer.C)
+	parser := NewParser(NewTokenizer(bytes.NewBufferString(simpleObject)))
 	parserErr := parser.Parse(&value)
 
 	assert.NoError(t, tokenizerErr)

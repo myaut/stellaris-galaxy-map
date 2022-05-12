@@ -121,9 +121,25 @@ func (t *Tokenizer) readString() (err error) {
 		return err
 	}
 
-	t.curBuf, err = t.in.ReadBytes('"')
-	if err != nil {
-		return err
+	var stringTerminated bool
+	for !stringTerminated {
+		buf, err := t.in.ReadBytes('"')
+		if err != nil {
+			return err
+		}
+
+		if len(buf) >= 2 && buf[len(buf)-2] == '\\' {
+			buf = buf[:len(buf)-1]
+			buf[len(buf)-1] = '"'
+		} else {
+			stringTerminated = true
+		}
+
+		if len(t.curBuf) == 0 {
+			t.curBuf = buf
+		} else {
+			t.curBuf = append(t.curBuf, buf...)
+		}
 	}
 
 	if l := len(t.curBuf); l > 0 {
@@ -142,8 +158,8 @@ func (t *Tokenizer) setType(tokenType TokenType) error {
 		return nil
 	}
 
-	return fmt.Errorf("unexpected character: cannot transition from state %s to %s",
-		t.curType, tokenType)
+	return fmt.Errorf("unexpected character: cannot transition from state %s (%s...) to %s",
+		t.curType, string(t.curBuf[:20]), tokenType)
 }
 
 func (t *Tokenizer) writeToken(tokenType TokenType, value string) {
