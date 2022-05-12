@@ -3,7 +3,6 @@ package sgmparser
 import (
 	"fmt"
 	"reflect"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -14,14 +13,13 @@ type ParserError struct {
 }
 
 func (pe *ParserError) Error() string {
-	sort.Reverse(sort.StringSlice(pe.elemStack))
 	return fmt.Sprintf("error parsing value %s: %s",
 		strings.Join(pe.elemStack, " -> "), pe.innerErr)
 }
 
 func WrapParserError(elem string, innerErr error) error {
 	if pe, ok := innerErr.(*ParserError); ok {
-		pe.elemStack = append(pe.elemStack, elem)
+		pe.elemStack = append([]string{elem}, pe.elemStack...)
 		return pe
 	}
 
@@ -73,11 +71,27 @@ func (p *Parser) parseMap(v reflect.Value) error {
 		}
 
 		valueToken := <-p.ch
-		value := reflect.New(valueType).Elem()
-		if err := p.parseValue(valueToken, value); err != nil {
-			return WrapParserError(token.Value, err)
+
+		var (
+			value    reflect.Value
+			valueErr error
+		)
+		if valueType.Kind() == reflect.Ptr {
+			if valueToken.Type == TokenIdentifier && valueToken.Value == TokenNone {
+				v.SetMapIndex(key, reflect.Zero(valueType))
+				continue
+			}
+
+			value = reflect.New(valueType.Elem())
+			valueErr = p.parseValue(valueToken, value.Elem())
+		} else {
+			value = reflect.New(valueType).Elem()
+			valueErr = p.parseValue(valueToken, value)
 		}
 
+		if valueErr != nil {
+			return WrapParserError(token.Value, valueErr)
+		}
 		v.SetMapIndex(key, value)
 	}
 
@@ -130,23 +144,44 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 		isSlice bool
 	)
 	if v.Kind() == reflect.Slice && valueToken.Type != TokenCollectionStart {
-		slice, v = v, reflect.New(v.Type().Elem())
+		slice, v = v, reflect.New(v.Type().Elem()).Elem()
 		isSlice = true
 	}
 
 	switch v.Kind() {
-	case reflect.Int:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if err := p.ensureToken(valueToken, TokenNumber); err != nil {
 			return err
 		}
 
-		i, err := strconv.Atoi(valueToken.Value)
+		i, err := strconv.ParseInt(valueToken.Value, 10, v.Type().Bits())
 		if err != nil {
-			return fmt.Errorf("error parsing number at line %d: %w",
-				valueToken.LineNo, err)
+			return fmt.Errorf("error parsing number at line %d: %w", valueToken.LineNo, err)
 		}
 
 		v.SetInt(int64(i))
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		if err := p.ensureToken(valueToken, TokenNumber); err != nil {
+			return err
+		}
+
+		u, err := strconv.ParseUint(valueToken.Value, 10, v.Type().Bits())
+		if err != nil {
+			return fmt.Errorf("error parsing number at line %d: %w", valueToken.LineNo, err)
+		}
+
+		v.SetUint(uint64(u))
+	case reflect.Float64:
+		if err := p.ensureToken(valueToken, TokenNumber); err != nil {
+			return err
+		}
+
+		f, err := strconv.ParseFloat(valueToken.Value, 64)
+		if err != nil {
+			return fmt.Errorf("error parsing number at line %d: %w", valueToken.LineNo, err)
+		}
+
+		v.SetFloat(f)
 	case reflect.String:
 		switch valueToken.Type {
 		case TokenString, TokenIdentifier:
@@ -162,7 +197,7 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 				break
 			}
 
-			el := reflect.New(v.Type().Elem())
+			el := reflect.New(v.Type().Elem()).Elem()
 			err := p.parseValue(elToken, el)
 			if err != nil {
 				return err
@@ -187,8 +222,8 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 
 func (p *Parser) ensureToken(token Token, expectedType TokenType) error {
 	if token.Type != expectedType {
-		return fmt.Errorf("unexpected token: expected %s, got %s at line %d",
-			expectedType, token.Type, token.LineNo)
+		return fmt.Errorf("unexpected token: expected %s, got %s ('%s') at line %d",
+			expectedType, token.Type, token.Value, token.LineNo)
 	}
 	return nil
 }

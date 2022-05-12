@@ -9,6 +9,8 @@ import (
 
 type TokenType int
 
+const TokenNone = "none"
+
 const (
 	TokenTypeUndefined TokenType = iota
 	TokenIdentifier
@@ -87,13 +89,20 @@ func (t *Tokenizer) Run() error {
 				t.lineNo++
 			}
 			t.flush()
-		case unicode.IsDigit(rune(b)):
+		case unicode.IsDigit(rune(b)) || b == '.':
 			if t.curType != TokenIdentifier {
 				err = t.setType(TokenNumber)
 			}
 			t.curBuf = append(t.curBuf, b)
+		case b == '-':
+			err = t.setType(TokenNumber)
+			t.curBuf = append(t.curBuf, b)
 		default:
-			err = t.setType(TokenIdentifier)
+			if t.curType == TokenNumber {
+				t.curType = TokenIdentifier
+			} else {
+				err = t.setType(TokenIdentifier)
+			}
 			t.curBuf = append(t.curBuf, b)
 		}
 		if err != nil {
