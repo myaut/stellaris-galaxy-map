@@ -4,6 +4,10 @@ type Point struct {
 	X, Y float64
 }
 
+func (p Point) Point() Point {
+	return p
+}
+
 func (p Point) Add(diff Point) Point {
 	return Point{X: p.X + diff.X, Y: p.Y + diff.Y}
 }

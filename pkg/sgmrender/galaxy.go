@@ -2,85 +2,144 @@ package sgmrender
 
 import (
 	"fmt"
-	"math"
 	"strings"
+
+	"github.com/pzsz/voronoi"
 
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
 )
 
 const (
-	countryAngleStep = math.Pi / 6.0
-	defaultCellSize  = 20.0
+	maxCellSize      = 40.0
+	countryBorderGap = 0.8
 )
 
-func (r *Renderer) renderCountries() {
-	renderedStars := make(map[sgm.StarId]struct{})
-	for starId, star := range r.state.Stars {
-		if star.Starbase == nil {
-			continue
-		}
+type countryRenderer struct {
+	r *Renderer
 
-		path := r.renderCountryChunk(starId, star, nil, NewPath(), renderedStars)
-		r.createPath(r.canvas, defaultStarStyle, path.Complete())
-	}
+	starMap map[voronoi.Vertex]*sgm.Star
+	diagram *voronoi.Diagram
+
+	renderedCells map[*voronoi.Cell]struct{}
 }
 
-func (r *Renderer) renderCountryChunk(
-	starId sgm.StarId, star *sgm.Star, prevStar *sgm.Star, path Path,
-	renderedStars map[sgm.StarId]struct{},
+func (r *Renderer) createCountryRenderer() *countryRenderer {
+	cr := &countryRenderer{
+		starMap:       make(map[voronoi.Vertex]*sgm.Star),
+		renderedCells: make(map[*voronoi.Cell]struct{}),
+	}
+
+	sites := make([]voronoi.Vertex, 0, len(r.state.Stars))
+	for _, star := range r.state.Stars {
+		point := star.Point()
+		vertex := voronoi.Vertex{X: point.X, Y: point.Y}
+
+		sites = append(sites, vertex)
+		cr.starMap[vertex] = star
+	}
+
+	bbox := voronoi.NewBBox(
+		r.bounds.Min.X-canvasPadding/2,
+		r.bounds.Max.X+canvasPadding/2,
+		r.bounds.Min.Y-canvasPadding/2,
+		r.bounds.Max.Y+canvasPadding/2)
+	cr.diagram = voronoi.ComputeDiagram(sites, bbox, true)
+	return cr
+}
+
+func (cr *countryRenderer) buildPoint(cellPoint sgmmath.Point, ev voronoi.EdgeVertex) sgmmath.Point {
+	point := sgmmath.Point{ev.X, ev.Y}
+	pv := sgmmath.NewVector(cellPoint, point).ToPolar()
+
+	if pv.Length > maxCellSize {
+		return pv.PointAtLength(maxCellSize)
+	}
+	return pv.PointAtLength(pv.Length - countryBorderGap)
+}
+
+func (cr *countryRenderer) buildPath(
+	star *sgm.Star, cell, prevCell *voronoi.Cell, owner sgm.CountryId, path Path,
 ) Path {
-	if _, isRendered := renderedStars[starId]; isRendered {
+	if _, isRendered := cr.renderedCells[cell]; isRendered {
 		return path
 	}
-	renderedStars[starId] = struct{}{}
+	cr.renderedCells[cell] = struct{}{}
 
-	// Build list of adjancencies except list of recently visited nodes
-	adjList := r.starGeoIndex[starId]
-	if prevStar != nil {
-		for i, adjNode := range adjList {
-			if adjNode.AdjStar == prevStar {
-				adjList = append(adjList[i+1:], adjList[:i]...)
+	halfEdges := cell.Halfedges
+	if prevCell != nil {
+		for i, he := range halfEdges {
+			otherCell := he.Edge.GetOtherCell(cell)
+			if otherCell == prevCell {
+				halfEdges = append(halfEdges[i:], halfEdges[:i]...)
 				break
 			}
 		}
 	}
 
-	addPoint := func(point sgmmath.Point) {
-		if len(path.path) == 0 {
-			path = path.MoveToPoint(point)
-		} else {
-			path = path.LineToPoint(point)
-		}
-	}
-
-	for i, nextNode := range adjList {
-		var prevNode StarAdjacency
-		if i == 0 {
-			prevNode = adjList[len(adjList)-1]
-		} else {
-			prevNode = adjList[i-1]
-		}
-
-		prevStarbase := prevNode.AdjStar.Starbase
-		nextStarbase := nextNode.AdjStar.Starbase
-		if prevStarbase == nil || prevStarbase.Owner != star.Starbase.Owner {
-			prevMiddle := prevNode.Vector.PointAtOffset(0.48)
-			nextMiddle := nextNode.Vector.PointAtOffset(0.48)
-			v := sgmmath.Vector{prevMiddle, nextMiddle}
-
-			addPoint(v.ToPolar().PointAtOffset(0.5))
-
-			if nextStarbase == nil || nextStarbase.Owner != star.Starbase.Owner {
-				addPoint(nextMiddle)
+	cellPoint := sgmmath.Point{cell.Site.X, cell.Site.Y}
+	for _, he := range halfEdges {
+		otherCell := he.Edge.GetOtherCell(cell)
+		if otherCell != nil {
+			otherStar := cr.starMap[otherCell.Site]
+			if otherStar.IsOwnedBy(owner) {
+				path = cr.buildPath(otherStar, otherCell, cell, owner, path)
+				continue
 			}
-		} else {
-			path = r.renderCountryChunk(nextNode.AdjStarId, nextNode.AdjStar,
-				star, path, renderedStars)
+
+			// Enclaves break logic by making crazy moves throughout entire canvas
+			// for now completely ignore them
+			// TODO: Compute set difference for them
+			var enclaveEdges int
+			for _, otherEdge := range otherCell.Halfedges {
+				enclaveCell := otherEdge.Edge.GetOtherCell(otherCell)
+				if enclaveCell != nil {
+					enclaveStar := cr.starMap[enclaveCell.Site]
+					if enclaveStar.IsOwnedBy(owner) {
+						enclaveEdges++
+					}
+				}
+			}
+			if enclaveEdges >= len(otherCell.Halfedges)-1 {
+				continue
+			}
 		}
+
+		startPoint := cr.buildPoint(cellPoint, he.Edge.Va)
+		endPoint := cr.buildPoint(cellPoint, he.Edge.Vb)
+		if he.Edge.LeftCell == otherCell {
+			startPoint, endPoint = endPoint, startPoint
+		}
+
+		if len(path.path) == 0 {
+			path = path.MoveToPoint(startPoint)
+		}
+		path = path.LineToPoint(endPoint)
+	}
+	return path
+}
+
+func (r *Renderer) renderCountries() {
+	cr := r.createCountryRenderer()
+
+	for _, cell := range cr.diagram.Cells {
+		star := cr.starMap[cell.Site]
+		if star.Starbase == nil {
+			continue
+		}
+
+		owner := star.Starbase.Owner
+
+		path := cr.buildPath(star, cell, nil, owner, NewPath())
+		r.createPath(r.canvas, defaultStarStyle, path.Complete())
 	}
 
-	return path
+	/*
+		for _, edge := range cr.diagram.Edges {
+			r.createPath(r.canvas, hyperlaneStyle,
+				NewPath().MoveTo(edge.Va.X, edge.Va.Y).LineTo(edge.Vb.X, edge.Vb.Y))
+		}
+	*/
 }
 
 func (r *Renderer) renderStars() {
@@ -127,12 +186,12 @@ func (r *Renderer) renderHyperlanes() {
 	renderedStars := make(map[sgm.StarId]struct{})
 
 	for starId, star := range r.state.Stars {
-		for _, hl := range star.Hyperlanes {
-			if _, isRendered := renderedStars[hl.To]; isRendered {
+		for _, hyperlane := range star.Hyperlanes {
+			if _, isRendered := renderedStars[hyperlane.ToId]; isRendered {
 				continue
 			}
 
-			pv := sgmmath.NewVector(star, r.state.Stars[hl.To]).ToPolar()
+			pv := sgmmath.NewVector(star, hyperlane.To).ToPolar()
 			r.createPath(r.canvas, hyperlaneStyle,
 				NewPath().
 					MoveToPoint(pv.PointAtLength(2*starSize)).

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	canvasPadding = 20
+	canvasPadding = 40
 
 	starSize     = 2.0
 	starbaseSize = 3.0

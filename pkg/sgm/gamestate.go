@@ -54,7 +54,7 @@ func LoadGameState(path string) (*GameState, error) {
 	}
 
 	// Build references between objects in the universe
-	for _, star := range state.Stars {
+	for starId, star := range state.Stars {
 		if star.StarbaseId != DefaultStarbaseId {
 			star.Starbase = state.StarbaseMgr.Starbases[star.StarbaseId]
 			if star.Starbase != nil {
@@ -82,6 +82,15 @@ func LoadGameState(path string) (*GameState, error) {
 				}
 			} else {
 				log.Printf("error: megastructure #%d is not found", megastructureId)
+			}
+		}
+
+		for i, hyperlane := range star.Hyperlanes {
+			if toStar := state.Stars[hyperlane.ToId]; toStar != nil {
+				star.Hyperlanes[i].To = toStar
+			} else {
+				log.Printf("error: star #%d is not found in hyperlane from star #%d",
+					hyperlane.ToId, starId)
 			}
 		}
 	}

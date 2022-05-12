@@ -31,13 +31,30 @@ func (s *Star) Point() sgmmath.Point {
 	return sgmmath.Point{X: -s.Coordinate.X, Y: s.Coordinate.Y}
 }
 
+func (s *Star) IsOwnedBy(countryId CountryId) bool {
+	if s.Starbase == nil {
+		return false
+	}
+	return s.Starbase.Owner == countryId
+}
+
+func (s *Star) HasHyperlane(dst *Star) bool {
+	for _, hyperlane := range s.Hyperlanes {
+		if hyperlane.To == dst {
+			return true
+		}
+	}
+	return false
+}
+
 type Coordinate struct {
 	X float64 `sgm:"x"`
 	Y float64 `sgm:"y"`
 }
 
 type Hyperlane struct {
-	To StarId `sgm:"to"`
+	ToId StarId `sgm:"to"`
+	To   *Star
 }
 
 type WormholeId uint32
