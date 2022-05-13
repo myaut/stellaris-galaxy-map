@@ -22,6 +22,7 @@ type GameState struct {
 	Bypasses map[BypassId]*Bypass `sgm:"bypasses"`
 
 	Countries      map[CountryId]*Country             `sgm:"country"`
+	Sectors        map[SectorId]*Sector               `sgm:"sectors"`
 	StarbaseMgr    StarbaseMgr                        `sgm:"starbase_mgr"`
 	Megastructures map[MegastructureId]*Megastructure `sgm:"megastructures"`
 }
@@ -47,6 +48,13 @@ func LoadGameState(path string) (*GameState, error) {
 
 	// Build references between objects in the universe
 	for starId, star := range state.Stars {
+		if star.SectorId != DefaultSectorId {
+			star.Sector = state.Sectors[star.SectorId]
+			if star.Sector == nil {
+				log.Printf("error: sector #%d is not found", star.SectorId)
+			}
+		}
+
 		if star.StarbaseId != DefaultStarbaseId {
 			star.Starbase = state.StarbaseMgr.Starbases[star.StarbaseId]
 			if star.Starbase != nil {

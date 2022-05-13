@@ -48,10 +48,18 @@ var (
 		StyleOption{"fill", "black"},
 	)
 
+	countryTextStyle = NewStyle(
+		StyleOption{"font-family", "sans-serif"},
+		StyleOption{"stroke-width", "0.5pt"},
+		StyleOption{"stroke", "black"},
+		StyleOption{"fill", "white"},
+	)
+
 	baseCountryStyle = NewStyle(
 		StyleOption{"stroke-width", "2pt"},
 		StyleOption{"stroke-linejoin", "miter"},
 		StyleOption{"fill-opacity", ".4"},
+		StyleOption{"fill-rule", "evenodd"},
 	)
 )
 

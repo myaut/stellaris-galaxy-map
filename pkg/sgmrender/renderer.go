@@ -33,9 +33,10 @@ const (
 
 const (
 	traceFlagStarIndex = 1 << iota
+	traceFlagCountrySegments
 	traceFlagShowGraphEdges
 
-	traceFlags = 0
+	traceFlags = traceFlagCountrySegments
 )
 
 //go:embed icons/*.svg
@@ -47,6 +48,7 @@ type Renderer struct {
 	canvas *etree.Element
 
 	bounds       sgmmath.BoundingRect
+	innerBounds  sgmmath.BoundingRect
 	starGeoIndex StarGeoIndex
 
 	iconCache map[string]*etree.Document
@@ -115,38 +117,6 @@ func (r *Renderer) Render() {
 	r.renderStars()
 }
 
-func (r *Renderer) renderCountries() {
-	cr := r.createCountryRenderer()
-
-	for _, cell := range cr.diagram.Cells {
-		star := cr.starMap[cell.Site]
-		if star.Starbase == nil {
-			continue
-		}
-
-		owner := star.Starbase.Owner
-		country := r.state.Countries[owner]
-
-		// TODO: handle "use_as_border_color", cases when colors are not found
-		borderColor := sgm.ColorMap.Colors[country.Flag.Colors[1]]
-		countryColor := sgm.ColorMap.Colors[country.Flag.Colors[0]]
-		countryStyle := baseCountryStyle.With(
-			StyleOption{"stroke", borderColor.Map.Color().ToHexCode().String()},
-			StyleOption{"fill", countryColor.Map.Color().ToHexCode().String()},
-		)
-
-		path := cr.buildPath(star, cell, nil, owner, NewPath())
-		r.createPath(r.canvas, countryStyle, path.Complete())
-	}
-
-	if traceFlags&traceFlagShowGraphEdges != 0 {
-		for _, edge := range cr.diagram.Edges {
-			r.createPath(r.canvas, hyperlaneStyle,
-				NewPath().MoveTo(edge.Va.X, edge.Va.Y).LineTo(edge.Vb.X, edge.Vb.Y))
-		}
-	}
-}
-
 type starRenderContext struct {
 	starId sgm.StarId
 	star   *sgm.Star
@@ -155,8 +125,6 @@ type starRenderContext struct {
 	iconOffset   float64
 	colonyOffset float64
 	quadrant     int
-
-	hadRingWorld bool
 }
 
 func (r *Renderer) renderStars() {
@@ -197,7 +165,7 @@ func (r *Renderer) renderStars() {
 		r.renderFeatures(ctx)
 
 		if star.HasPops() || star.HasUpgradedStarbase() ||
-			star.HasSignificatMegastructures() {
+			star.HasSignificantMegastructures() {
 
 			stars = append(stars, ctx)
 		}
@@ -225,14 +193,19 @@ func (r *Renderer) renderFeatures(ctx *starRenderContext) {
 
 	colonies := ctx.star.Colonies(false)
 	habitats := ctx.star.Colonies(true)
-	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureStar)
+	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureSizeStar)
+	ringWorlds := ctx.star.MegastructuresBySize(sgm.MegastructureSizeRingWorld)
 	sort.Slice(colonies, func(i, j int) bool {
 		return colonies[i].EmployablePops > colonies[j].EmployablePops
 	})
 
 	planetPoint := sgmmath.Point{X: ctx.colonyOffset, Y: -ctx.iconOffset}
 	for _, ms := range megastructures {
-		r.renderMegastructure(ctx, planetPoint, "star", ms, iconSizeMd)
+		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeStar, ms, iconSizeMd)
+		planetPoint.X += iconStepMd
+	}
+	if len(ringWorlds) > 0 {
+		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeRingWorld, ringWorlds[0], iconSizeMd)
 		planetPoint.X += iconStepMd
 	}
 	for _, planet := range colonies {
@@ -242,7 +215,7 @@ func (r *Renderer) renderFeatures(ctx *starRenderContext) {
 	ctx.colonyOffset = planetPoint.X
 
 	planetStations := append(
-		ctx.star.MegastructuresBySize(sgm.MegastructurePlanet),
+		ctx.star.MegastructuresBySize(sgm.MegastructureSizePlanet),
 		make([]*sgm.Megastructure, len(habitats))...)
 	planetStationsStep := 2
 	if len(planetStations) > 4 {
@@ -250,7 +223,7 @@ func (r *Renderer) renderFeatures(ctx *starRenderContext) {
 	}
 	for i, ms := range planetStations {
 		if ms != nil {
-			r.renderMegastructure(ctx, planetPoint, "planet", ms, iconSizeSm)
+			r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizePlanet, ms, iconSizeSm)
 		} else {
 			r.createIcon(ctx.g, planetPoint, "habitat", iconSizeSm)
 		}
@@ -265,22 +238,23 @@ func (r *Renderer) renderFeatures(ctx *starRenderContext) {
 }
 
 func (r *Renderer) renderMegastructure(
-	ctx *starRenderContext, point sgmmath.Point, iconSuffix string,
+	ctx *starRenderContext, point sgmmath.Point, msSize int,
 	ms *sgm.Megastructure, iconSize float64,
 ) {
 	msType, stage := ms.TypeStage()
-	if msType == sgm.MegastructureRingWorld {
-		if ctx.hadRingWorld {
-			return
-		}
-		ctx.hadRingWorld = true
-	}
 
-	icons := []string{"megastructure-" + iconSuffix}
+	var icons []string
 	if stage < 0 {
 		icons = []string{"megastructure-ruined"}
+	} else {
+		switch msSize {
+		case sgm.MegastructureSizePlanet:
+			icons = []string{"megastructure-planet"}
+			fallthrough
+		default:
+			icons = append(icons, "megastructure-"+strings.ReplaceAll(msType, "_", "-"))
+		}
 	}
-	icons = append(icons, "megastructure-"+strings.ReplaceAll(msType, "_", "-"))
 
 	for _, icon := range icons {
 		r.createIcon(ctx.g, point, icon, iconSize)

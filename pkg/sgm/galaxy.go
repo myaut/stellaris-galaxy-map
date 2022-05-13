@@ -2,11 +2,16 @@ package sgm
 
 import (
 	"math"
+	"strings"
 
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
 )
 
 const (
+	DistantStarInitializer       = "distantstars_init"
+	DistantStarInitializerLGate0 = "distantstars_init_00"
+	DistantStarInitializerLGate6 = "distantstars_init_06"
+
 	PlanetClassEcumenopolis = "pc_city"
 	PlanetClassHabitat      = "pc_habitat"
 
@@ -20,11 +25,15 @@ const (
 
 type StarId int
 type Star struct {
-	Type string `sgm:"type"`
-	Name string `sgm:"name"`
+	Type        string `sgm:"type"`
+	Name        string `sgm:"name"`
+	Initializer string `sgm:"initializer"`
 
 	Coordinate Coordinate  `sgm:"coordinate"`
 	Hyperlanes []Hyperlane `sgm:"hyperlane"`
+
+	SectorId SectorId `sgm:"sector"`
+	Sector   *Sector
 
 	StarbaseId StarbaseId `sgm:"starbase"`
 	Starbase   *Starbase
@@ -39,11 +48,22 @@ type Star struct {
 	Wormholes   []*Wormhole
 }
 
+func (s *Star) Point() sgmmath.Point {
+	return sgmmath.Point{X: -s.Coordinate.X, Y: s.Coordinate.Y}
+}
+
 func (s *Star) Owner() CountryId {
 	if s.Starbase == nil {
 		return DefaultCountryId
 	}
 	return s.Starbase.Owner
+}
+
+func (s *Star) IsOwnedBy(countryId CountryId) bool {
+	if s.Starbase == nil {
+		return false
+	}
+	return s.Starbase.Owner == countryId
 }
 
 func (s *Star) Bypasses() (bypasses []string) {
@@ -67,11 +87,11 @@ func (s *Star) Bypasses() (bypasses []string) {
 	return bypasses
 }
 
-func (s *Star) HasSignificatMegastructures() bool {
+func (s *Star) HasSignificantMegastructures() bool {
 	for _, ms := range s.Megastructures {
 		msType, _ := ms.TypeStage()
 		msSize, _ := MegastructureSize[msType]
-		if msSize >= MegastructurePlanet {
+		if msSize >= MegastructureSizePlanet {
 			return true
 		}
 	}
@@ -99,15 +119,17 @@ func (s *Star) Colonies(isHabitat bool) (colonies []*Planet) {
 	return
 }
 
-func (s *Star) Point() sgmmath.Point {
-	return sgmmath.Point{X: -s.Coordinate.X, Y: s.Coordinate.Y}
-}
-
-func (s *Star) IsOwnedBy(countryId CountryId) bool {
-	if s.Starbase == nil {
+func (s *Star) HasCapital() bool {
+	if s.Sector == nil || s.Sector.Type != SectorCore {
 		return false
 	}
-	return s.Starbase.Owner == countryId
+
+	for _, planet := range s.Planets {
+		if planet.Designation == PlanetDesignationCapital {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Star) HasHyperlane(dst *Star) bool {
@@ -128,6 +150,18 @@ func (s *Star) HasPops() bool {
 		if planet.EmployablePops > 0 {
 			return true
 		}
+	}
+	return false
+}
+
+// IsDistant returns true if star is from distant star pack (L-Galaxy)
+func (s *Star) IsDistant() bool {
+	if strings.HasPrefix(s.Initializer, DistantStarInitializer) {
+		switch s.Initializer {
+		case DistantStarInitializerLGate0, DistantStarInitializerLGate6:
+			return false
+		}
+		return true
 	}
 	return false
 }

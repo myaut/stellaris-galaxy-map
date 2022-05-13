@@ -1,5 +1,9 @@
 package sgmmath
 
+import (
+	"math"
+)
+
 type Point struct {
 	X, Y float64
 }
@@ -31,6 +35,10 @@ type BoundingRect struct {
 	Max Point
 }
 
+func NewBoundingRect(point Point) BoundingRect {
+	return BoundingRect{point, point}
+}
+
 func (rect *BoundingRect) Add(point Point) {
 	if rect.Min.X > point.X {
 		rect.Min.X = point.X
@@ -46,6 +54,39 @@ func (rect *BoundingRect) Add(point Point) {
 	}
 }
 
+func (rect *BoundingRect) Sub(point Point) {
+	center := rect.Center()
+	if point.X < center.X && rect.Min.X < point.X {
+		rect.Min.X = point.X
+	}
+	if point.Y < center.Y && rect.Min.Y < point.Y {
+		rect.Min.Y = point.Y
+	}
+	if point.X > center.X && rect.Max.X > point.X {
+		rect.Max.X = point.X
+	}
+	if point.Y > center.Y && rect.Max.Y > point.Y {
+		rect.Max.Y = point.Y
+	}
+}
+
+func (rect *BoundingRect) Center() Point {
+	return Point{
+		X: (rect.Min.X + rect.Max.X) / 2,
+		Y: (rect.Min.Y + rect.Max.Y) / 2,
+	}
+}
+
+func (rect *BoundingRect) Includes(point Point) bool {
+	return (rect.Min.X <= point.X && rect.Min.Y <= point.Y &&
+		rect.Max.X >= point.X && rect.Max.Y >= point.Y)
+}
+
+func (rect *BoundingRect) Contains(other BoundingRect) bool {
+	return (rect.Min.X <= other.Min.X && rect.Min.Y <= other.Min.Y &&
+		rect.Max.X >= other.Max.X && rect.Max.Y >= other.Max.Y)
+}
+
 func (rect *BoundingRect) Size() (float64, float64) {
-	return rect.Max.X - rect.Min.X, rect.Max.Y - rect.Min.Y
+	return math.Abs(rect.Max.X - rect.Min.X), math.Abs(rect.Max.Y - rect.Min.Y)
 }

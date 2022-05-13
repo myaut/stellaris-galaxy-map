@@ -1,12 +1,16 @@
 package sgm
 
 import (
+	"fmt"
 	"math"
 
 	"strings"
 )
 
 const (
+	SectorCore   = "core_sector"
+	SectorNormal = "normal_sector"
+
 	StarbaseOutpost  = "starbase_level_outpost"
 	StarbaseStarport = "starbase_level_starport"
 	StarbaseFortress = "starbase_level_starfortress"
@@ -49,21 +53,23 @@ const (
 	MegastructureGateway = "gateway"
 	MegastructureLGate   = "lgate_base"
 
-	MegastructureStar   = 2
-	MegastructurePlanet = 1
+	MegastructureSizeRingWorld = 3
+	MegastructureSizeStar      = 2
+	MegastructureSizePlanet    = 1
 )
 
 var MegastructureSize = map[string]int{
-	MegastructureRingWorld:   MegastructureStar,
-	MegastructureDysonSphere: MegastructureStar,
-	MegastructureMatterUnzip: MegastructureStar,
+	MegastructureRingWorld: MegastructureSizeRingWorld,
 
-	MegastructureScienceNexus:         MegastructurePlanet,
-	MegastructureSentryArray:          MegastructurePlanet,
-	MegastructureArtInstallation:      MegastructurePlanet,
-	MegastructureInterstellarAssembly: MegastructurePlanet,
-	MegastructureShipyard:             MegastructurePlanet,
-	MegastructureStrategicCenter:      MegastructurePlanet,
+	MegastructureDysonSphere: MegastructureSizeStar,
+	MegastructureMatterUnzip: MegastructureSizeStar,
+
+	MegastructureScienceNexus:         MegastructureSizePlanet,
+	MegastructureSentryArray:          MegastructureSizePlanet,
+	MegastructureArtInstallation:      MegastructureSizePlanet,
+	MegastructureInterstellarAssembly: MegastructureSizePlanet,
+	MegastructureShipyard:             MegastructureSizePlanet,
+	MegastructureStrategicCenter:      MegastructureSizePlanet,
 }
 
 type StarbaseRole int
@@ -174,6 +180,14 @@ type Country struct {
 	Flag CountryFlag `sgm:"flag"`
 }
 
+var DefaultSectorId = SectorId(math.MaxUint32)
+
+type SectorId uint32
+type Sector struct {
+	Name string `sgm:"name"`
+	Type string `sgm:"type"`
+}
+
 type MegastructureId uint32
 type Megastructure struct {
 	Type     string   `sgm:"type"`
@@ -199,4 +213,14 @@ func (m Megastructure) TypeStage() (string, int) {
 
 type CountryFlag struct {
 	Colors []string `sgm:"colors"`
+}
+
+func CountryName(countryId CountryId, country *Country) string {
+	if country != nil {
+		return country.Name
+	}
+	if countryId == DefaultCountryId {
+		return "_default"
+	}
+	return fmt.Sprint(countryId)
 }

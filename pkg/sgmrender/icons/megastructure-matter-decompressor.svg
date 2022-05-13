@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 4.2333333 4.2333333"
+   height="16"
+   width="16">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:#ffaaaa;stroke:#800000;stroke-width:0.35268958;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+     d="m 0.26458332,1.3229165 v 1.3229171 l 1.05833448,1.3229136 1.5874991,2.9e-6 1.058333,-1.3229165 V 1.3229165 L 2.9104169,0.26458344 H 1.3229163 Z"
+     id="path1758-3" />
+  <path
+     id="path1792-8-6"
+     style="fill:none;stroke:#800000;stroke-width:0.17647708;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 2.9104166,1.1651329 V 2.9104166 M 0.97201941,0.75282597 1.3229167,1.2242585 H 2.9708072 L 3.2995668,0.81112407 M 1.3229167,1.1651329 V 2.9104166 M 0.97201907,3.3818488 1.3229163,2.9104163 h 1.6478905 l 0.3287596,0.4131343" />
+  <g
+     transform="translate(0.56714644,0.42153954)"
+     id="g839">
+    <path
+       style="opacity:1;vector-effect:none;fill:#800000;fill-opacity:1;stroke:#ffaaaa;stroke-width:0.14178516;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 2.0597034,2.0786888 H 3.1939812 L 3.3357699,2.3622609 2.768631,3.6383274 H 2.4850589 L 1.9179147,2.3622609 Z"
+       id="path1182-4" />
+    <path
+       id="path1203-36"
+       style="opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#ffaaaa;stroke-width:0.14178516;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 1.9179147,2.3622609 2.3432702,2.645833 H 2.9104144 L 3.3357699,2.3622609 M 2.6268423,3.6383274 2.9104144,2.645833 2.7686257,2.0786888 M 2.6268423,3.6383274 2.3432702,2.645833 2.4850589,2.0786888" />
+  </g>
+</svg>

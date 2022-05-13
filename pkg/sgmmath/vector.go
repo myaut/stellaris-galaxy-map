@@ -53,3 +53,8 @@ func (pv PolarVector) ToVector() Vector {
 		End:   pv.PointAtLength(pv.Length),
 	}
 }
+
+func (pv PolarVector) Sector(sectorCount int) int {
+	sector := math.Floor(float64(sectorCount/2) * pv.Angle / math.Pi)
+	return (sectorCount/2 + int(sector)) % sectorCount
+}
