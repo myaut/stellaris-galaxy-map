@@ -15,11 +15,10 @@ import (
 
 const (
 	canvasPadding = 40
+	canvasWidth   = 2160
+	canvasHeight  = 2160
 
-	starSize     = 2.0
-	outpostSize  = 3.0
-	starbaseSize = 4.2
-	fontSize     = 3.2
+	fontSize = 3.2
 
 	maxCellSize      = 40.0
 	countryBorderGap = 1.2
@@ -36,7 +35,7 @@ const (
 	traceFlagCountrySegments
 	traceFlagShowGraphEdges
 
-	traceFlags = traceFlagCountrySegments
+	traceFlags = 0
 )
 
 //go:embed icons/*.svg
@@ -63,8 +62,8 @@ func NewRenderer(state *sgm.GameState) *Renderer {
 	r.doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 
 	r.canvas = r.doc.CreateElement("svg")
-	r.canvas.CreateAttr("width", "1080")
-	r.canvas.CreateAttr("height", "1080")
+	r.canvas.CreateAttr("width", fmt.Sprint(canvasWidth))
+	r.canvas.CreateAttr("height", fmt.Sprint(canvasHeight))
 	r.canvas.CreateAttr("viewBox",
 		fmt.Sprintf("%f %f %f %f",
 			r.bounds.Min.X-canvasPadding,
@@ -112,9 +111,19 @@ func (r *Renderer) computeBounds() {
 }
 
 func (r *Renderer) Render() {
-	r.renderCountries()
+	countries := r.renderCountries()
 	r.renderHyperlanes()
-	r.renderStars()
+
+	significantStars := r.renderStars()
+
+	r.renderCountryNames(countries)
+	for _, ctx := range significantStars {
+		r.renderStarbase(ctx)
+		r.renderStarFeatures(ctx)
+	}
+	for _, ctx := range significantStars {
+		r.renderStarName(ctx)
+	}
 }
 
 type starRenderContext struct {
@@ -124,73 +133,93 @@ type starRenderContext struct {
 	g            *etree.Element
 	iconOffset   float64
 	colonyOffset float64
+	hasFleets    bool
 	quadrant     int
 }
 
-func (r *Renderer) renderStars() {
-	var stars []*starRenderContext
-
+func (r *Renderer) renderStars() (stars []*starRenderContext) {
 	for starId, star := range r.state.Stars {
 		ctx := &starRenderContext{starId: starId, star: star}
 		ctx.quadrant = r.pickTextQuadrant(ctx.starId)
 
-		ctx.g = r.canvas.CreateElement("g")
 		p := star.Point()
+		ctx.g = r.canvas.CreateElement("g")
 		ctx.g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", p.X, p.Y))
 
 		// Render starbase if one exists, otherwise render
-		if star.Starbase == nil {
+		if star.Starbase == nil || !star.IsSignificant() {
 			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
-			ctx.iconOffset = starSize
-		} else if star.Starbase.Level == sgm.StarbaseOutpost {
-			r.createPath(ctx.g, baseStarbaseStyle, outpostPath)
-			ctx.iconOffset = outpostSize
-		} else {
-			r.createPath(ctx.g, starbaseStyles[star.Starbase.Level], starbasePath)
-			ctx.iconOffset = starbaseSize
-
-			if star.Starbase.Level == sgm.StarbaseCitadel {
-				r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
-			}
-
-			role := star.Starbase.Role()
-			if role != sgm.StarbaseRoleMax {
-				rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
-				r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
-			}
+			continue
 		}
-		ctx.colonyOffset = ctx.iconOffset / 2
-
-		// Render system features: megastructures, planets, etc.
-		r.renderFeatures(ctx)
-
-		if star.HasPops() || star.HasUpgradedStarbase() ||
-			star.HasSignificantMegastructures() {
-
-			stars = append(stars, ctx)
-		}
+		stars = append(stars, ctx)
 	}
 
-	for _, ctx := range stars {
-		r.renderStarName(ctx)
-	}
+	return
 }
 
-func (r *Renderer) renderFeatures(ctx *starRenderContext) {
+func (r *Renderer) renderStarbase(ctx *starRenderContext) {
+	if ctx.star.Starbase.Level == sgm.StarbaseOutpost {
+		r.createPath(ctx.g, outpostStyle, outpostPath)
+		ctx.iconOffset = outpostHalfSize
+	} else {
+		r.createPath(ctx.g, starbaseStyles[ctx.star.Starbase.Level], starbasePath)
+		ctx.iconOffset = starbaseHalfSize
+
+		if ctx.star.Starbase.Level == sgm.StarbaseCitadel {
+			r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
+		}
+
+		role := ctx.star.Starbase.Role()
+		if role != sgm.StarbaseRoleMax {
+			rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
+			r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
+		}
+	}
+	ctx.colonyOffset = ctx.iconOffset / 2
+}
+
+func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
+	// Bypasses
 	bypasses := ctx.star.Bypasses()
 	transportPoint := sgmmath.Point{
 		X: -ctx.iconOffset/2 - float64(len(bypasses))*iconSizeSm,
-		Y: -ctx.iconOffset/2 - iconSizeSm/2,
+		Y: -iconSizeSm / 2,
 	}
 	if ctx.quadrant >= 0 {
-		transportPoint.Y = 0.0
+		transportPoint.Y = -ctx.iconOffset/2 - iconSizeSm/2
 	}
-
 	for _, bypass := range bypasses {
 		r.createIcon(ctx.g, transportPoint, "bypass-"+bypass, iconSizeSm)
 		transportPoint.X += iconSizeSm
 	}
 
+	// Fleets
+	fleets := ctx.star.MobileMilitaryFleets()
+	fleetPoint := sgmmath.Point{
+		X: -ctx.iconOffset / 2,
+		Y: -ctx.iconOffset/2 - 2*fleetHalfSize - 0.5,
+	}
+	var extraFleets int
+	if len(fleets) > 4 {
+		extraFleets = len(fleets) - 4
+		fleets = fleets[:4]
+	}
+	for range fleets {
+		g := ctx.g.CreateElement("g")
+		g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", fleetPoint.X, fleetPoint.Y))
+		r.createPath(g, fleetStyle, fleetPath)
+		fleetPoint.X += fleetStep
+	}
+	if extraFleets > 0 {
+		text := ctx.g.CreateElement("text")
+		text.CreateAttr("x", fmt.Sprintf("%f", fleetPoint.X-fleetStep))
+		text.CreateAttr("y", fmt.Sprintf("%f", fleetPoint.Y+fleetHalfSize))
+		text.CreateAttr("style", fleetTextStyle.String())
+		text.CreateText(fmt.Sprintf("+%d", extraFleets))
+	}
+	ctx.hasFleets = len(fleets) > 0
+
+	// Other features
 	colonies := ctx.star.Colonies(false)
 	habitats := ctx.star.Colonies(true)
 	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureSizeStar)
@@ -266,14 +295,14 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 	style := basePlanetStyle
 	switch {
 	case planet.EmployablePops > 75:
-		style = style.With(StyleOption{"stroke-width", "0.8pt"})
-		radius -= 0.4
+		style = style.With(StyleOption{"stroke-width", "1.0pt"})
+		radius -= 0.2
 	case planet.EmployablePops > 50:
-		style = style.With(StyleOption{"stroke-width", "0.5pt"})
-		radius -= 0.25
+		style = style.With(StyleOption{"stroke-width", "0.8pt"})
+		radius -= 0.15
 	case planet.EmployablePops > 25:
-		style = style.With(StyleOption{"stroke-width", "0.33pt"})
-		radius -= 0.17
+		style = style.With(StyleOption{"stroke-width", "0.6pt"})
+		radius -= 0.1
 	}
 
 	circle := ctx.g.CreateElement("circle")
@@ -301,15 +330,15 @@ func (r *Renderer) renderStarName(ctx *starRenderContext) {
 	switch ctx.quadrant {
 	case 0, -1:
 		textAnchor = "start"
-		p.X -= starbaseSize / 2
+		p.X -= starbaseHalfSize
 	case 1, -2:
 		textAnchor = "end"
 		p.X += ctx.iconOffset + ctx.colonyOffset
 	}
-	if ctx.quadrant >= 0 {
+	if ctx.quadrant >= 0 && !ctx.hasFleets {
 		p.Y -= ctx.iconOffset + 2*fontSize/3
 	} else {
-		p.Y += ctx.iconOffset + 2*fontSize/3
+		p.Y += ctx.iconOffset + fontSize/2
 	}
 
 	text := r.canvas.CreateElement("text")
@@ -332,8 +361,8 @@ func (r *Renderer) renderHyperlanes() {
 			pv := sgmmath.NewVector(star, hyperlane.To).ToPolar()
 			r.createPath(r.canvas, hyperlaneStyle,
 				NewPath().
-					MoveToPoint(pv.PointAtLength(2*starSize)).
-					LineToPoint(pv.PointAtLength(pv.Length-2*starSize)))
+					MoveToPoint(pv.PointAtLength(2*starHalfSize)).
+					LineToPoint(pv.PointAtLength(pv.Length-2*starHalfSize)))
 		}
 
 		renderedStars[starId] = struct{}{}
@@ -344,6 +373,16 @@ func (r *Renderer) createPath(el *etree.Element, style Style, path Path) {
 	pathEl := el.CreateElement("path")
 	pathEl.CreateAttr("style", style.String())
 	pathEl.CreateAttr("d", path.String())
+}
+
+func (r *Renderer) createRect(el *etree.Element, style Style, rect sgmmath.BoundingRect) {
+	w, h := rect.Size()
+	rectEl := el.CreateElement("rect")
+	rectEl.CreateAttr("style", style.String())
+	rectEl.CreateAttr("x", fmt.Sprintf("%f", rect.Min.X))
+	rectEl.CreateAttr("y", fmt.Sprintf("%f", rect.Min.Y))
+	rectEl.CreateAttr("width", fmt.Sprintf("%f", w))
+	rectEl.CreateAttr("height", fmt.Sprintf("%f", h))
 }
 
 func (r *Renderer) createIcon(el *etree.Element, p sgmmath.Point, iconName string, size float64) {

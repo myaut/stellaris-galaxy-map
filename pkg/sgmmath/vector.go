@@ -1,7 +1,19 @@
 package sgmmath
 
 import (
+	"fmt"
 	"math"
+)
+
+type SectorDirection int
+
+const (
+	DirectionTop SectorDirection = iota
+	DirectionBottom
+	DirectionLeft
+	DirectionRight
+
+	DirectionMax
 )
 
 type Pointable interface {
@@ -23,6 +35,10 @@ func NewVector(begin, end Pointable) Vector {
 		Begin: begin.Point(),
 		End:   end.Point(),
 	}
+}
+
+func (v Vector) Size() (float64, float64) {
+	return math.Abs(v.End.X - v.Begin.X), math.Abs(v.End.Y - v.Begin.Y)
 }
 
 func (v Vector) ToPolar() PolarVector {
@@ -57,4 +73,20 @@ func (pv PolarVector) ToVector() Vector {
 func (pv PolarVector) Sector(sectorCount int) int {
 	sector := math.Floor(float64(sectorCount/2) * pv.Angle / math.Pi)
 	return (sectorCount/2 + int(sector)) % sectorCount
+}
+
+func (pv PolarVector) Direction() SectorDirection {
+	sector := pv.Sector(8)
+	switch sector {
+	case 1, 2:
+		return DirectionBottom
+	case 3, 4:
+		return DirectionRight
+	case 5, 6:
+		return DirectionTop
+	case 7, 0:
+		return DirectionLeft
+	}
+
+	panic(fmt.Sprintf("unexpected sector value %d", sector))
 }

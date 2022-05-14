@@ -100,6 +100,7 @@ var MegastructureStages = map[string]int{
 	"2":        2,
 	"3":        3,
 	"4":        4,
+	"5":        5,
 	"restored": 10,
 	"final":    20,
 }
@@ -223,4 +224,14 @@ func CountryName(countryId CountryId, country *Country) string {
 		return "_default"
 	}
 	return fmt.Sprint(countryId)
+}
+
+type FleetId uint32
+type Fleet struct {
+	Name     string `sgm:"name"`
+	Station  bool   `sgm:"station"`
+	Mobile   bool   `sgm:"mobile"`
+	Civilian bool   `sgm:"civilian"`
+
+	MilitaryPower float64 `sgm:"military_power"`
 }

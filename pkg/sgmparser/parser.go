@@ -162,6 +162,18 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 	}
 
 	switch v.Kind() {
+	case reflect.Bool:
+		if err := p.ensureToken(valueToken, TokenIdentifier); err != nil {
+			return err
+		}
+		switch valueToken.Value {
+		case "yes":
+			v.SetBool(true)
+		case "no":
+			v.SetBool(false)
+		default:
+			return fmt.Errorf("unexpected boolean '%s' at line %d", valueToken.Value, valueToken.LineNo)
+		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if err := p.ensureToken(valueToken, TokenNumber); err != nil {
 			return err

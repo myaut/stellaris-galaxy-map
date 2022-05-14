@@ -25,6 +25,7 @@ type GameState struct {
 	Sectors        map[SectorId]*Sector               `sgm:"sectors"`
 	StarbaseMgr    StarbaseMgr                        `sgm:"starbase_mgr"`
 	Megastructures map[MegastructureId]*Megastructure `sgm:"megastructures"`
+	Fleets         map[FleetId]*Fleet                 `sgm:"fleet"`
 }
 
 func LoadGameState(path string) (*GameState, error) {
@@ -82,6 +83,14 @@ func LoadGameState(path string) (*GameState, error) {
 				}
 			} else {
 				log.Printf("error: megastructure #%d is not found", megastructureId)
+			}
+		}
+
+		for _, fleetId := range star.FleetIds {
+			if fleet := state.Fleets[fleetId]; fleet != nil {
+				star.Fleets = append(star.Fleets, fleet)
+			} else {
+				log.Printf("error: fleet #%d is not found", fleetId)
 			}
 		}
 

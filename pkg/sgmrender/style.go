@@ -2,8 +2,25 @@ package sgmrender
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
+)
+
+const (
+	countryFontSize = 8.0
+
+	colorStationStroke = "#2e4053"
+	colorStationFill   = "#aeb6bf"
+
+	colorStarStroke = "#ac9d93"
+	colorStarFill   = "#e9c6af"
+
+	colorMilitaryStroke = "#2e86c1"
+	colorMilitaryFill   = "#aed6f1"
+
+	colorPlanetStroke = "#27ae60"
+	colorPlanetFill   = "#abebc6"
 )
 
 var (
@@ -14,14 +31,14 @@ var (
 
 	defaultStarStyle = NewStyle(
 		StyleOption{"stroke-width", "0.33pt"},
-		StyleOption{"stroke", "#2e4053"},
-		StyleOption{"fill", "#aeb6bf"},
+		StyleOption{"stroke", colorStarStroke},
+		StyleOption{"fill", colorStarFill},
 	)
 
 	baseStarbaseStyle = NewStyle(
 		StyleOption{"stroke-width", "0.33pt"},
-		StyleOption{"stroke", "#2e86c1"},
-		StyleOption{"fill", "#aed6f1"},
+		StyleOption{"stroke", colorMilitaryStroke},
+		StyleOption{"fill", colorMilitaryFill},
 	)
 
 	starbaseStyles = map[string]Style{
@@ -34,10 +51,22 @@ var (
 		sgm.StarbaseCaravaneer: defaultStarStyle,
 	}
 
+	fleetStyle = NewStyle(
+		StyleOption{"stroke-width", "0.33pt"},
+		StyleOption{"stroke", colorMilitaryStroke},
+		StyleOption{"fill", colorMilitaryFill},
+	)
+
+	outpostStyle = NewStyle(
+		StyleOption{"stroke-width", "0.2pt"},
+		StyleOption{"stroke", colorStationStroke},
+		StyleOption{"fill", colorStationFill},
+	)
+
 	basePlanetStyle = NewStyle(
-		StyleOption{"stroke-width", "0.5pt"},
-		StyleOption{"stroke", "#27ae60"},
-		StyleOption{"fill", "#abebc6"},
+		StyleOption{"stroke-width", "0.4pt"},
+		StyleOption{"stroke", colorPlanetStroke},
+		StyleOption{"fill", colorPlanetFill},
 	)
 
 	starTextStyle = NewStyle(
@@ -50,9 +79,11 @@ var (
 
 	countryTextStyle = NewStyle(
 		StyleOption{"font-family", "sans-serif"},
-		StyleOption{"stroke-width", "0.5pt"},
-		StyleOption{"stroke", "black"},
-		StyleOption{"fill", "white"},
+		StyleOption{"stroke-width", "0.12pt"},
+		StyleOption{"font-size", fmt.Sprintf("%fpt", countryFontSize)},
+		StyleOption{"font-variant", "petite-caps"},
+		StyleOption{"stroke", "white"},
+		StyleOption{"fill", "black"},
 	)
 
 	baseCountryStyle = NewStyle(
@@ -60,6 +91,14 @@ var (
 		StyleOption{"stroke-linejoin", "miter"},
 		StyleOption{"fill-opacity", ".4"},
 		StyleOption{"fill-rule", "evenodd"},
+	)
+
+	fleetTextStyle = NewStyle(
+		StyleOption{"font-family", "sans-serif"},
+		StyleOption{"font-size", "3.2pt"},
+		StyleOption{"stroke-width", "0.08pt"},
+		StyleOption{"stroke", colorMilitaryFill},
+		StyleOption{"fill", colorMilitaryStroke},
 	)
 )
 

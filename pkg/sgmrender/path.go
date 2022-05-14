@@ -7,15 +7,29 @@ import (
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
 )
 
+const (
+	fleetHalfSize = 2.0
+	fleetStep     = 3.2
+
+	starHalfSize     = 2.0
+	outpostHalfSize  = 3.0
+	starbaseHalfSize = 4.2
+)
+
 var (
 	defaultStarPath = NewPath().
-			MoveTo(-starSize, 0.0).LineTo(0.0, starSize).
-			LineTo(starSize, 0.0).LineTo(0.0, -starSize).
+			MoveTo(-starHalfSize, 0.0).LineTo(0.0, starHalfSize).
+			LineTo(starHalfSize, 0.0).LineTo(0.0, -starHalfSize).
 			Complete()
 
-	outpostPath      = newStarbasePath(outpostSize)
-	starbasePath     = newStarbasePath(starbaseSize)
-	citadelInnerPath = newStarbasePath(starbaseSize / 2)
+	outpostPath      = newStarbasePath(outpostHalfSize)
+	starbasePath     = newStarbasePath(starbaseHalfSize)
+	citadelInnerPath = newStarbasePath(starbaseHalfSize / 2)
+
+	fleetPath = NewPath().MoveTo(0.0, -fleetHalfSize).
+			LineTo(-fleetHalfSize, -fleetHalfSize/3.0).
+			LineTo(-fleetHalfSize/2.0, fleetHalfSize).HorLine(fleetHalfSize/2.0).
+			LineTo(fleetHalfSize, -fleetHalfSize/3.0).Complete()
 )
 
 func newStarbasePath(size float64) Path {

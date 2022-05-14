@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"strings"
+	"unicode"
 
 	"github.com/pzsz/voronoi"
 
@@ -43,8 +44,8 @@ type countrySegmentAdjancency struct {
 type countrySegment struct {
 	countryId sgm.CountryId
 
-	flags               countrySegFlag
-	bounds, innerBounds sgmmath.BoundingRect
+	flags  countrySegFlag
+	bounds sgmmath.BoundingRect
 
 	stars map[sgm.StarId]struct{}
 
@@ -63,6 +64,12 @@ type countryRenderer struct {
 	segments []*countrySegment
 }
 
+type countryRenderContext struct {
+	country *sgm.Country
+	seg     *countrySegment
+	style   Style
+}
+
 func (r *Renderer) createCountryRenderer() *countryRenderer {
 	cr := &countryRenderer{
 		r: r,
@@ -71,7 +78,8 @@ func (r *Renderer) createCountryRenderer() *countryRenderer {
 		cellMap: make(map[*voronoi.Cell]*countrySegment),
 	}
 
-	sites := make([]voronoi.Vertex, 0, len(r.state.Stars))
+	// First site is (0.0, 0.0) - galaxy center
+	sites := make([]voronoi.Vertex, 1, len(r.state.Stars)+1)
 	for starId, star := range r.state.Stars {
 		vertex := voronoi.Vertex(star.Point())
 		cr.starMap[vertex] = starId
@@ -103,6 +111,9 @@ func (cr *countryRenderer) getBorderNeighbor(border *voronoi.Halfedge) (*voronoi
 func (cr *countryRenderer) initSegments() {
 	// Walk all cells and build country segments
 	for _, cell := range cr.diagram.Cells {
+		if cell.Site.X == 0.0 && cell.Site.Y == 0.0 {
+			continue
+		}
 		if _, walkedCell := cr.cellMap[cell]; walkedCell {
 			continue
 		}
@@ -110,27 +121,24 @@ func (cr *countryRenderer) initSegments() {
 		starId, star := cr.starByCell(cell)
 		seg := &countrySegment{
 			countryId: star.Owner(),
-			bounds:    sgmmath.NewBoundingRect(star.Point()),
+			bounds:    sgmmath.NewBoundingRect(),
 			stars: map[sgm.StarId]struct{}{
 				starId: struct{}{},
 			},
 			cells:     []*voronoi.Cell{cell},
 			neighbors: make(map[*countrySegment]countrySegmentAdjancency),
 		}
-		cr.buildSegment(seg, star, cell, nil)
+		cr.buildSegment(seg, starId, star, cell, nil)
 		cr.segments = append(cr.segments, seg)
 	}
 
 	// After we identified all borders, find neighbors and enclaves
 	for _, seg := range cr.segments {
-		seg.innerBounds = seg.bounds
-
 		for _, border := range seg.borders {
-			neighCell, neighSeg := cr.getBorderNeighbor(border)
+			_, neighSeg := cr.getBorderNeighbor(border)
 			if neighSeg == nil {
 				continue
 			}
-			seg.innerBounds.Sub(sgmmath.Point(neighCell.Site))
 
 			if _, knownNeighbor := seg.neighbors[neighSeg]; !knownNeighbor {
 				var adjNode countrySegmentAdjancency
@@ -146,10 +154,9 @@ func (cr *countryRenderer) initSegments() {
 
 	if traceFlags&traceFlagCountrySegments != 0 {
 		for _, seg := range cr.segments {
-			log.Printf("InitSeg: %p (%s) - stars: %d, neigh: %d, flags: %s, bounds: %v/%v\n",
+			log.Printf("InitSeg: %p (%s) - stars: %d, neigh: %d, flags: %s, bounds: %v\n",
 				seg, sgm.CountryName(seg.countryId, cr.r.state.Countries[seg.countryId]),
-				len(seg.stars), len(seg.neighbors), seg.flags.String(),
-				seg.bounds, seg.innerBounds)
+				len(seg.stars), len(seg.neighbors), seg.flags.String(), seg.bounds)
 		}
 	}
 }
@@ -215,7 +222,8 @@ func (cr *countryRenderer) isEnclave(seg, outerSeg *countrySegment) bool {
 }
 
 func (cr *countryRenderer) buildSegment(
-	seg *countrySegment, star *sgm.Star, cell, prevCell *voronoi.Cell,
+	seg *countrySegment, starId sgm.StarId, star *sgm.Star,
+	cell, prevCell *voronoi.Cell,
 ) {
 	if _, walkedCell := cr.cellMap[cell]; walkedCell {
 		return
@@ -247,9 +255,8 @@ func (cr *countryRenderer) buildSegment(
 			// Recursively walk edges counter-clockwise
 			seg.cells = append(seg.cells, neighCell)
 			seg.stars[neighStarId] = struct{}{}
-			seg.bounds.Add(neighStar.Point())
 
-			cr.buildSegment(seg, neighStar, neighCell, cell)
+			cr.buildSegment(seg, neighStarId, neighStar, neighCell, cell)
 		} else {
 			if math.Signbit(he.Cell.Site.X) != math.Signbit(neighCell.Site.X) &&
 				math.Signbit(he.Cell.Site.Y) != math.Signbit(neighCell.Site.Y) {
@@ -263,6 +270,17 @@ func (cr *countryRenderer) buildSegment(
 			seg.flags |= countrySegHasCapital
 		}
 	}
+
+	seg.bounds.Add(star.Point())
+}
+
+func (cr *countryRenderer) hasForeignNeighbors(seg *countrySegment, starId sgm.StarId) bool {
+	for _, adjNode := range cr.r.starGeoIndex[starId] {
+		if !adjNode.AdjStar.IsOwnedBy(seg.countryId) {
+			return true
+		}
+	}
+	return false
 }
 
 func (cr *countryRenderer) buildPoint(
@@ -328,9 +346,10 @@ func (cr *countryRenderer) buildPath(
 	return path
 }
 
-func (r *Renderer) renderCountries() {
+func (r *Renderer) renderCountries() []countryRenderContext {
 	cr := r.createCountryRenderer()
 
+	countries := make([]countryRenderContext, 0, len(cr.segments))
 	for _, seg := range cr.segments {
 		if seg.countryId == sgm.DefaultCountryId {
 			continue
@@ -340,7 +359,7 @@ func (r *Renderer) renderCountries() {
 		// TODO: handle "use_as_border_color", cases when colors are not found
 		borderColor := sgm.ColorMap.Colors[country.Flag.Colors[1]]
 		countryColor := sgm.ColorMap.Colors[country.Flag.Colors[0]]
-		countryStyle := baseCountryStyle.With(
+		style := baseCountryStyle.With(
 			StyleOption{"stroke", borderColor.Map.Color().ToHexCode().String()},
 			StyleOption{"fill", countryColor.Map.Color().ToHexCode().String()},
 		)
@@ -353,9 +372,13 @@ func (r *Renderer) renderCountries() {
 					path, -1.0, true).Complete()
 			}
 		}
+		r.createPath(r.canvas, style, path)
 
-		r.createPath(r.canvas, countryStyle, path)
-		r.renderCountryName(seg, country)
+		countries = append(countries, countryRenderContext{
+			country: country,
+			seg:     seg,
+			style:   style,
+		})
 	}
 
 	if traceFlags&traceFlagShowGraphEdges != 0 {
@@ -364,49 +387,129 @@ func (r *Renderer) renderCountries() {
 				NewPath().MoveTo(edge.Va.X, edge.Va.Y).LineTo(edge.Vb.X, edge.Vb.Y))
 		}
 	}
+
+	return countries
 }
 
-func (r *Renderer) renderCountryName(seg *countrySegment, country *sgm.Country) {
-	var maxLineLength int
-	lines := strings.Split(country.Name, " ")
+func (r *Renderer) renderCountryNames(countries []countryRenderContext) {
+	var smallCountryNames []string
+	smallCountries := make(map[sgm.CountryId]int)
+
+	for _, ctx := range countries {
+		lines, maxLineLength := []string{ctx.country.Name}, len(ctx.country.Name)
+		rectW, _ := ctx.seg.bounds.Size()
+		if float64(maxLineLength)*countryFontSize > 0.8*rectW {
+			lines, maxLineLength = r.countryNameLines(ctx.country.Name)
+		}
+
+		point, foundPoint := r.findCountryNamePoint(ctx.seg, maxLineLength, len(lines))
+		style := countryTextStyle
+		if !foundPoint {
+			if index, hasIndex := smallCountries[ctx.seg.countryId]; hasIndex {
+				lines = []string{fmt.Sprint(index)}
+			} else {
+				index := len(smallCountryNames) + 1
+				smallCountries[ctx.seg.countryId] = index
+				smallCountryNames = append(smallCountryNames, ctx.country.Name)
+				lines = []string{fmt.Sprint(index)}
+			}
+
+			point = ctx.seg.bounds.Center()
+			style = style.With(
+				StyleOption{"font-size", fmt.Sprintf("%fpt", countryFontSize*0.75)},
+			)
+		}
+
+		y := point.Y + 1.2*countryFontSize
+		for _, line := range lines {
+			text := r.canvas.CreateElement("text")
+			text.CreateAttr("x", fmt.Sprintf("%f", point.X))
+			text.CreateAttr("y", fmt.Sprintf("%f", y))
+			text.CreateAttr("style", style.String())
+			text.CreateAttr("text-anchor", "middle")
+			text.CreateText(line)
+
+			y += countryFontSize
+		}
+	}
+}
+
+func (r *Renderer) countryNameLines(name string) (lines []string, maxLineLength int) {
+	lines = strings.Split(name, " ")
+	for i, line := range lines {
+		if i > 0 && !unicode.IsUpper(rune(line[0])) {
+			lines = append(
+				append(lines[:i-1], fmt.Sprintf("%s %s", lines[i-1], line)),
+				lines[i+1:]...,
+			)
+		}
+	}
 	for _, line := range lines {
 		if len(line) > maxLineLength {
 			maxLineLength = len(line)
 		}
 	}
+	return
+}
 
-	rect := seg.innerBounds
-	w, h := rect.Size()
-	if w < float64(maxLineLength)*fontSize || h < fontSize {
-		if seg.flags&countrySegHasCapital == 0 {
-			// No need to bother put name on every enclave
-			return
+func (r *Renderer) findCountryNamePoint(seg *countrySegment, maxLineLength, lineCount int) (point sgmmath.Point, found bool) {
+	center := seg.bounds.Center()
+	distance := math.Inf(+1)
+
+	requiredWidth := float64(maxLineLength) * countryFontSize
+	requiredHeight := float64(lineCount) * countryFontSize
+starLoop:
+	for starId := range seg.stars {
+		star := r.state.Stars[starId]
+		starPoint := star.Point()
+		if starPoint.X-seg.bounds.Min.X < requiredWidth/2 {
+			starPoint.X += requiredWidth / 4
+		} else if seg.bounds.Max.X-starPoint.X < requiredWidth/2 {
+			starPoint.X -= requiredWidth / 4
 		}
-		println(w, h, country.Name)
-		rect = seg.bounds
+		if star.IsSignificant() {
+			starPoint.Y += fontSize + countryFontSize/2
+		}
+
+		rect := sgmmath.BoundingRect{
+			Min: sgmmath.Point{
+				X: starPoint.X - requiredWidth/2,
+				Y: starPoint.Y - countryFontSize/2,
+			},
+			Max: sgmmath.Point{
+				X: starPoint.X + requiredWidth/2,
+				Y: starPoint.Y + requiredHeight + countryFontSize/2,
+			},
+		}
+
+		for _, border := range seg.borders {
+			if rect.Includes(sgmmath.Point(border.Edge.Va.Vertex)) ||
+				rect.Includes(sgmmath.Point(border.Edge.Vb.Vertex)) {
+				continue starLoop
+			}
+		}
+		for _, adjNode := range r.starGeoIndex[starId] {
+			var probeOffset float64
+			if !adjNode.AdjStar.IsOwnedBy(seg.countryId) {
+				probeOffset = 0.5
+			} else if adjNode.AdjStar.IsSignificant() {
+				probeOffset = 0.8
+			} else {
+				continue
+			}
+
+			probe := adjNode.Vector.PointAtOffset(probeOffset)
+			if rect.Includes(probe) {
+				continue starLoop
+			}
+		}
+
+		found = true
+		starDistance := center.Distance(starPoint)
+		if starDistance < distance {
+			point, distance = starPoint, starDistance
+		}
 	}
 
-	w, h = rect.Size()
-	nameSize := math.Floor(0.8 * w / float64(maxLineLength))
-	if nameSize > 0.8*h {
-		nameSize = math.Floor(0.8 * h)
-	}
-
-	style := countryTextStyle.With(
-		StyleOption{"font-size", fmt.Sprintf("%.2fpt", nameSize)},
-	)
-
-	center := rect.Center()
-	y := center.Y - (nameSize*float64(len(lines)))/2
-	for _, line := range lines {
-		center := rect.Center()
-		text := r.canvas.CreateElement("text")
-		text.CreateAttr("x", fmt.Sprintf("%f", center.X))
-		text.CreateAttr("y", fmt.Sprintf("%f", y))
-		text.CreateAttr("style", style.String())
-		text.CreateAttr("text-anchor", "middle")
-		text.CreateText(line)
-
-		y += nameSize
-	}
+	return
 }

@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="16"
-   height="16"
-   viewBox="0 0 4.2333333 4.2333333"
+   id="svg8"
    version="1.1"
-   id="svg8">
+   viewBox="0 0 4.2333333 4.2333333"
+   height="16"
+   width="16">
   <defs
      id="defs2" />
   <metadata
@@ -25,11 +25,11 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="fill:#333333;fill-opacity:1;stroke:#b1b1b1;stroke-width:0.09963635;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 1.3153019,2.9104166 c 0,0 0.682532,-0.517994 1.1944316,-0.5118996 0.5179942,-0.0061 1.1944331,0.5118996 1.1944331,0.5118996 0,0 -0.6825334,0.5179929 -1.1944331,0.5118998 C 1.9978339,3.4162155 1.3153019,2.9104166 1.3153019,2.9104166 Z"
-     id="path1833-3" />
+     id="path1833-3"
+     d="m 0.52916666,2.2743787 c 0,0 0.90714174,-0.6415814 1.58749894,-0.6340329 0.6884574,-0.00756 1.587501,0.6340329 1.587501,0.6340329 0,0 -0.9071437,0.6415798 -1.587501,0.634033 -0.6803572,-0.00756 -1.58749894,-0.634033 -1.58749894,-0.634033 z"
+     style="fill:#333333;fill-opacity:1;stroke:#b1b1b1;stroke-width:0.12783726;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   <path
-     style="opacity:1;vector-effect:none;fill:#333333;fill-opacity:1;stroke:#b1b1b1;stroke-width:0.19490272;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 2.5113014,2.2780203 A 0.38414445,0.50587595 0 0 1 2.1385347,2.7836744 0.38414445,0.50587595 0 0 1 1.7436865,2.3079734 0.38414445,0.50587595 0 0 1 2.0930639,1.7741404 0.38414445,0.50587595 0 0 1 2.5086078,2.2182191"
      id="path1860-0"
-     d="M 2.8066568,2.9133567 A 0.28902965,0.40842951 0 0 1 2.5261878,3.3216071 0.28902965,0.40842951 0 0 1 2.2291046,2.93754 0.28902965,0.40842951 0 0 1 2.4919756,2.5065389 0.28902965,0.40842951 0 0 1 2.8046302,2.8650749" />
+     style="opacity:1;vector-effect:none;fill:#333333;fill-opacity:1;stroke:#b1b1b1;stroke-width:0.25006759;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
 </svg>

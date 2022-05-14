@@ -2,6 +2,7 @@ package sgm
 
 import (
 	"math"
+	"sort"
 	"strings"
 
 	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
@@ -22,6 +23,8 @@ const (
 	BypassGateway       = "gateway"
 	BypassGatewayRuined = "gateway-ruined"
 )
+
+var DefaultStarId = StarId(math.MaxUint32)
 
 type StarId int
 type Star struct {
@@ -46,6 +49,9 @@ type Star struct {
 
 	WormholeIds []WormholeId `sgm:"natural_wormholes"`
 	Wormholes   []*Wormhole
+
+	FleetIds []FleetId `sgm:"fleet_presence"`
+	Fleets   []*Fleet
 }
 
 func (s *Star) Point() sgmmath.Point {
@@ -141,6 +147,13 @@ func (s *Star) HasHyperlane(dst *Star) bool {
 	return false
 }
 
+func (s *Star) IsSignificant() bool {
+	return s.HasPops() ||
+		s.HasUpgradedStarbase() ||
+		s.HasSignificantMegastructures() ||
+		len(s.Bypasses()) > 0
+}
+
 func (s *Star) HasUpgradedStarbase() bool {
 	return s.Starbase != nil && s.Starbase.Level != StarbaseOutpost
 }
@@ -164,6 +177,20 @@ func (s *Star) IsDistant() bool {
 		return true
 	}
 	return false
+}
+
+func (s *Star) MobileMilitaryFleets() []*Fleet {
+	var fleets []*Fleet
+	for _, fleet := range s.Fleets {
+		if !fleet.Civilian && fleet.Mobile {
+			fleets = append(fleets, fleet)
+		}
+	}
+
+	sort.Slice(fleets, func(i, j int) bool {
+		return fleets[i].MilitaryPower < fleets[j].MilitaryPower
+	})
+	return fleets
 }
 
 type Coordinate struct {

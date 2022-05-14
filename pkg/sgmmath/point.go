@@ -35,11 +35,28 @@ type BoundingRect struct {
 	Max Point
 }
 
-func NewBoundingRect(point Point) BoundingRect {
-	return BoundingRect{point, point}
+func NewBoundingRect() BoundingRect {
+	return BoundingRect{
+		Min: Point{math.NaN(), math.NaN()},
+		Max: Point{math.NaN(), math.NaN()},
+	}
+}
+
+func NewPointBoundingRect(point Point) BoundingRect {
+	return BoundingRect{Min: point, Max: point}
+}
+
+func (rect *BoundingRect) IsZero() bool {
+	return math.IsNaN(rect.Min.X)
 }
 
 func (rect *BoundingRect) Add(point Point) {
+	if rect.IsZero() {
+		rect.Min = point
+		rect.Max = point
+		return
+	}
+
 	if rect.Min.X > point.X {
 		rect.Min.X = point.X
 	}
@@ -50,22 +67,6 @@ func (rect *BoundingRect) Add(point Point) {
 		rect.Max.X = point.X
 	}
 	if rect.Max.Y < point.Y {
-		rect.Max.Y = point.Y
-	}
-}
-
-func (rect *BoundingRect) Sub(point Point) {
-	center := rect.Center()
-	if point.X < center.X && rect.Min.X < point.X {
-		rect.Min.X = point.X
-	}
-	if point.Y < center.Y && rect.Min.Y < point.Y {
-		rect.Min.Y = point.Y
-	}
-	if point.X > center.X && rect.Max.X > point.X {
-		rect.Max.X = point.X
-	}
-	if point.Y > center.Y && rect.Max.Y > point.Y {
 		rect.Max.Y = point.Y
 	}
 }
