@@ -24,9 +24,15 @@ const (
 )
 
 var (
+	gridStyle = NewStyle(
+		StyleOption{"stroke-width", "0.33pt"},
+		StyleOption{"stroke", "#e5e8e8"},
+		StyleOption{"stroke-opacity", "0.2"},
+	)
+
 	hyperlaneStyle = NewStyle(
 		StyleOption{"stroke-width", "0.8pt"},
-		StyleOption{"stroke", "#e5e8e8"},
+		StyleOption{"stroke", "#d5dbdb"},
 	)
 
 	defaultStarStyle = NewStyle(
@@ -41,18 +47,14 @@ var (
 		StyleOption{"fill", colorMilitaryFill},
 	)
 
-	starbaseStyles = map[string]Style{
-		sgm.StarbaseStarport: baseStarbaseStyle.With(StyleOption{"stroke-width", "0.5pt"}),
-		sgm.StarbaseFortress: baseStarbaseStyle.With(StyleOption{"stroke-width", "0.8pt"}),
-		sgm.StarbaseStarhold: baseStarbaseStyle.With(StyleOption{"stroke-width", "1.0pt"}),
-		sgm.StarbaseCitadel:  baseStarbaseStyle.With(StyleOption{"stroke-width", "1.0pt"}),
-
-		sgm.StarbaseMarauder:   defaultStarStyle,
-		sgm.StarbaseCaravaneer: defaultStarStyle,
+	starbaseStrokes = map[string]float64{
+		sgm.StarbaseStarport: 0.5,
+		sgm.StarbaseStarhold: 0.75,
+		sgm.StarbaseFortress: 1.0,
+		sgm.StarbaseCitadel:  1.0,
 	}
 
 	fleetStyle = NewStyle(
-		StyleOption{"stroke-width", "0.33pt"},
 		StyleOption{"stroke", colorMilitaryStroke},
 		StyleOption{"fill", colorMilitaryFill},
 	)
@@ -65,6 +67,7 @@ var (
 
 	basePlanetStyle = NewStyle(
 		StyleOption{"stroke-width", "0.4pt"},
+		StyleOption{"stroke-alignment", "inner"},
 		StyleOption{"stroke", colorPlanetStroke},
 		StyleOption{"fill", colorPlanetFill},
 	)
@@ -84,6 +87,10 @@ var (
 		StyleOption{"font-variant", "petite-caps"},
 		StyleOption{"stroke", "white"},
 		StyleOption{"fill", "black"},
+	)
+
+	countryLegendStyle = countryTextStyle.With(
+		StyleOption{"font-size", fmt.Sprintf("%fpt", countryFontSize/2)},
 	)
 
 	baseCountryStyle = NewStyle(

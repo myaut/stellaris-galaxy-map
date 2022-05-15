@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 4.2333333 4.2333333"
+   width="16"
    height="16"
-   width="16">
+   viewBox="0 0 4.2333333 4.2333333"
+   version="1.1"
+   id="svg8">
   <defs
      id="defs2" />
   <metadata
@@ -25,11 +25,11 @@
     </rdf:RDF>
   </metadata>
   <path
-     id="path2011-4-0"
-     d="M 1.4522439,1.0865808 1.072457,1.2764742 1.6956341,1.5835707 2.075421,1.3936772 Z M 1.072457,1.3716251 V 3.0802575 L 1.6421373,3.3648934 V 1.656261 Z M 2.1166667,1.4663676 1.7368798,1.656261 V 3.3648934 L 2.1166667,3.175 Z"
-     style="fill:#27ae60;fill-opacity:1;stroke:none;stroke-width:0.01900184;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+     style="fill:#27ae60;fill-opacity:1;stroke:#abebc6;stroke-width:0.08819444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 1.9267733,1.425854 1.5469864,1.6157474 2.1701635,1.9228439 2.5499504,1.7329504 Z M 1.5469864,1.7108983 V 3.4195307 L 2.1166667,3.7041666 V 1.9955342 Z M 2.5911961,1.8056408 2.2114092,1.9955342 V 3.7041666 L 2.5911961,3.5142732 Z"
+     id="path2011-4-0" />
   <path
-     id="path2017-0-6"
-     d="M 2.7243257,1.7889823 2.4396897,1.9788757 2.7243257,2.1687691 3.0089616,1.9788757 Z M 2.401711,2.0360479 V 2.8903641 L 2.686347,3.0802575 V 2.2259413 Z m 0.6644227,0 -0.2850442,0.1898934 V 3.0802575 L 3.0661337,2.8903641 Z"
-     style="fill:#27ae60;fill-opacity:1;stroke:none;stroke-width:0.01900184;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+     style="fill:#27ae60;fill-opacity:1;stroke:#abebc6;stroke-width:0.08819444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 3.0977753,1.8090348 2.8131393,1.9989282 3.0977753,2.1888216 3.3824112,1.9989282 Z M 2.7751606,2.0561004 V 2.9104166 L 3.0597966,3.10031 V 2.2459938 Z m 0.6644227,0 -0.2850442,0.1898934 V 3.10031 L 3.4395833,2.9104166 Z"
+     id="path2017-0-6" />
 </svg>

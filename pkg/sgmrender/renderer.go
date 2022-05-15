@@ -4,8 +4,6 @@ import (
 	"embed"
 	"fmt"
 	"log"
-	"sort"
-	"strings"
 
 	"github.com/beevik/etree"
 
@@ -14,13 +12,16 @@ import (
 )
 
 const (
+	mapTitle   = "Galaxy Map"
+	footerText = "Made with Stellaris Galaxy Map"
+
 	canvasPadding = 40
 	canvasWidth   = 2160
 	canvasHeight  = 2160
 
 	fontSize = 3.2
 
-	maxCellSize      = 40.0
+	maxCellSize      = 48.0
 	countryBorderGap = 1.2
 
 	iconSizeSm  = 4.8
@@ -28,6 +29,8 @@ const (
 	iconSizeMd  = 6
 	iconStepMd  = 4.8
 	svgIconSize = 16
+
+	gridSplit = 16
 )
 
 const (
@@ -112,6 +115,7 @@ func (r *Renderer) computeBounds() {
 
 func (r *Renderer) Render() {
 	countries := r.renderCountries()
+	r.renderGrid()
 	r.renderHyperlanes()
 
 	significantStars := r.renderStars()
@@ -124,258 +128,43 @@ func (r *Renderer) Render() {
 	for _, ctx := range significantStars {
 		r.renderStarName(ctx)
 	}
+
+	titlePoint := r.bounds.Min
+	r.createText(r.canvas, countryTextStyle, titlePoint, mapTitle)
+	titlePoint.Y += countryFontSize
+	r.createText(r.canvas, countryLegendStyle, titlePoint, r.state.Name)
+	titlePoint.Y += 0.6 * countryFontSize
+	r.createText(r.canvas, countryLegendStyle, titlePoint, r.state.Date)
+
+	footerStyle := starTextStyle.With(StyleOption{"text-anchor", "end"})
+	footerPoint := r.bounds.Max.Add(sgmmath.Point{0.0, -2 * fontSize})
+	r.createText(r.canvas, footerStyle, footerPoint, footerText)
 }
 
-type starRenderContext struct {
-	starId sgm.StarId
-	star   *sgm.Star
+func (r *Renderer) renderGrid() {
+	w, h := r.bounds.Size()
+	gridStepX, gridStepY := w/gridSplit, h/gridSplit
 
-	g            *etree.Element
-	iconOffset   float64
-	colonyOffset float64
-	hasFleets    bool
-	quadrant     int
-}
-
-func (r *Renderer) renderStars() (stars []*starRenderContext) {
-	for starId, star := range r.state.Stars {
-		ctx := &starRenderContext{starId: starId, star: star}
-		ctx.quadrant = r.pickTextQuadrant(ctx.starId)
-
-		p := star.Point()
-		ctx.g = r.canvas.CreateElement("g")
-		ctx.g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", p.X, p.Y))
-
-		// Render starbase if one exists, otherwise render
-		if star.Starbase == nil || !star.IsSignificant() {
-			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
-			continue
-		}
-		stars = append(stars, ctx)
+	for x := r.bounds.Min.X + gridStepX; x < r.bounds.Max.X-gridStepX/2; x += gridStepX {
+		startPoint := sgmmath.Point{x, r.bounds.Min.Y - canvasPadding/2}
+		path := NewPath().MoveToPoint(startPoint).VertLine(r.bounds.Max.Y + canvasPadding/2)
+		r.createPath(r.canvas, gridStyle, path)
 	}
-
-	return
-}
-
-func (r *Renderer) renderStarbase(ctx *starRenderContext) {
-	if ctx.star.Starbase.Level == sgm.StarbaseOutpost {
-		r.createPath(ctx.g, outpostStyle, outpostPath)
-		ctx.iconOffset = outpostHalfSize
-	} else {
-		r.createPath(ctx.g, starbaseStyles[ctx.star.Starbase.Level], starbasePath)
-		ctx.iconOffset = starbaseHalfSize
-
-		if ctx.star.Starbase.Level == sgm.StarbaseCitadel {
-			r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
-		}
-
-		role := ctx.star.Starbase.Role()
-		if role != sgm.StarbaseRoleMax {
-			rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
-			r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
-		}
-	}
-	ctx.colonyOffset = ctx.iconOffset / 2
-}
-
-func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
-	// Bypasses
-	bypasses := ctx.star.Bypasses()
-	transportPoint := sgmmath.Point{
-		X: -ctx.iconOffset/2 - float64(len(bypasses))*iconSizeSm,
-		Y: -iconSizeSm / 2,
-	}
-	if ctx.quadrant >= 0 {
-		transportPoint.Y = -ctx.iconOffset/2 - iconSizeSm/2
-	}
-	for _, bypass := range bypasses {
-		r.createIcon(ctx.g, transportPoint, "bypass-"+bypass, iconSizeSm)
-		transportPoint.X += iconSizeSm
-	}
-
-	// Fleets
-	fleets := ctx.star.MobileMilitaryFleets()
-	fleetPoint := sgmmath.Point{
-		X: -ctx.iconOffset / 2,
-		Y: -ctx.iconOffset/2 - 2*fleetHalfSize - 0.5,
-	}
-	var extraFleets int
-	if len(fleets) > 4 {
-		extraFleets = len(fleets) - 4
-		fleets = fleets[:4]
-	}
-	for range fleets {
-		g := ctx.g.CreateElement("g")
-		g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", fleetPoint.X, fleetPoint.Y))
-		r.createPath(g, fleetStyle, fleetPath)
-		fleetPoint.X += fleetStep
-	}
-	if extraFleets > 0 {
-		text := ctx.g.CreateElement("text")
-		text.CreateAttr("x", fmt.Sprintf("%f", fleetPoint.X-fleetStep))
-		text.CreateAttr("y", fmt.Sprintf("%f", fleetPoint.Y+fleetHalfSize))
-		text.CreateAttr("style", fleetTextStyle.String())
-		text.CreateText(fmt.Sprintf("+%d", extraFleets))
-	}
-	ctx.hasFleets = len(fleets) > 0
-
-	// Other features
-	colonies := ctx.star.Colonies(false)
-	habitats := ctx.star.Colonies(true)
-	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureSizeStar)
-	ringWorlds := ctx.star.MegastructuresBySize(sgm.MegastructureSizeRingWorld)
-	sort.Slice(colonies, func(i, j int) bool {
-		return colonies[i].EmployablePops > colonies[j].EmployablePops
-	})
-
-	planetPoint := sgmmath.Point{X: ctx.colonyOffset, Y: -ctx.iconOffset}
-	for _, ms := range megastructures {
-		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeStar, ms, iconSizeMd)
-		planetPoint.X += iconStepMd
-	}
-	if len(ringWorlds) > 0 {
-		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeRingWorld, ringWorlds[0], iconSizeMd)
-		planetPoint.X += iconStepMd
-	}
-	for _, planet := range colonies {
-		r.renderPlanet(ctx, planetPoint, planet)
-		planetPoint.X += iconStepMd
-	}
-	ctx.colonyOffset = planetPoint.X
-
-	planetStations := append(
-		ctx.star.MegastructuresBySize(sgm.MegastructureSizePlanet),
-		make([]*sgm.Megastructure, len(habitats))...)
-	planetStationsStep := 2
-	if len(planetStations) > 4 {
-		planetStationsStep = 3
-	}
-	for i, ms := range planetStations {
-		if ms != nil {
-			r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizePlanet, ms, iconSizeSm)
-		} else {
-			r.createIcon(ctx.g, planetPoint, "habitat", iconSizeSm)
-		}
-
-		if (i+1)%planetStationsStep == 0 {
-			planetPoint.X = ctx.colonyOffset
-			planetPoint.Y += iconStepSm
-		} else {
-			planetPoint.X += iconStepSm
-		}
+	for y := r.bounds.Min.Y + gridStepY; y < r.bounds.Max.Y-gridStepY/2; y += gridStepY {
+		startPoint := sgmmath.Point{r.bounds.Min.X - canvasPadding/2, y}
+		path := NewPath().MoveToPoint(startPoint).HorLine(r.bounds.Max.X + canvasPadding/2)
+		r.createPath(r.canvas, gridStyle, path)
 	}
 }
 
-func (r *Renderer) renderMegastructure(
-	ctx *starRenderContext, point sgmmath.Point, msSize int,
-	ms *sgm.Megastructure, iconSize float64,
-) {
-	msType, stage := ms.TypeStage()
-
-	var icons []string
-	if stage < 0 {
-		icons = []string{"megastructure-ruined"}
-	} else {
-		switch msSize {
-		case sgm.MegastructureSizePlanet:
-			icons = []string{"megastructure-planet"}
-			fallthrough
-		default:
-			icons = append(icons, "megastructure-"+strings.ReplaceAll(msType, "_", "-"))
-		}
-	}
-
-	for _, icon := range icons {
-		r.createIcon(ctx.g, point, icon, iconSize)
-	}
-}
-
-func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, planet *sgm.Planet) {
-	radius := float64(iconSizeMd) / 2
-	style := basePlanetStyle
-	switch {
-	case planet.EmployablePops > 75:
-		style = style.With(StyleOption{"stroke-width", "1.0pt"})
-		radius -= 0.2
-	case planet.EmployablePops > 50:
-		style = style.With(StyleOption{"stroke-width", "0.8pt"})
-		radius -= 0.15
-	case planet.EmployablePops > 25:
-		style = style.With(StyleOption{"stroke-width", "0.6pt"})
-		radius -= 0.1
-	}
-
-	circle := ctx.g.CreateElement("circle")
-	circle.CreateAttr("cx", fmt.Sprintf("%f", point.X+radius))
-	circle.CreateAttr("cy", fmt.Sprintf("%f", point.Y+radius))
-	circle.CreateAttr("r", fmt.Sprintf("%f", radius))
-	circle.CreateAttr("style", style.String())
-
-	if planet.Designation == sgm.PlanetDesignationCapital {
-		r.createIcon(ctx.g, point, "colony-capital", iconSizeMd)
-	} else if planet.Class == sgm.PlanetClassEcumenopolis {
-		r.createIcon(ctx.g, point, "colony-ecumenopolis", iconSizeMd)
-	}
-}
-
-func (r *Renderer) renderStarName(ctx *starRenderContext) {
-	name := ctx.star.Name
-	if strings.HasPrefix(name, "NAME_") {
-		name = strings.ReplaceAll(name[5:], "_", " ")
-	}
-
-	p := ctx.star.Point()
-
-	var textAnchor string
-	switch ctx.quadrant {
-	case 0, -1:
-		textAnchor = "start"
-		p.X -= starbaseHalfSize
-	case 1, -2:
-		textAnchor = "end"
-		p.X += ctx.iconOffset + ctx.colonyOffset
-	}
-	if ctx.quadrant >= 0 && !ctx.hasFleets {
-		p.Y -= ctx.iconOffset + 2*fontSize/3
-	} else {
-		p.Y += ctx.iconOffset + fontSize/2
-	}
-
-	text := r.canvas.CreateElement("text")
-	text.CreateAttr("x", fmt.Sprintf("%f", p.X-ctx.iconOffset))
-	text.CreateAttr("y", fmt.Sprintf("%f", p.Y+ctx.iconOffset/2))
-	text.CreateAttr("style", starTextStyle.String())
-	text.CreateAttr("text-anchor", textAnchor)
-	text.CreateText(name)
-}
-
-func (r *Renderer) renderHyperlanes() {
-	renderedStars := make(map[sgm.StarId]struct{})
-
-	for starId, star := range r.state.Stars {
-		for _, hyperlane := range star.Hyperlanes {
-			if _, isRendered := renderedStars[hyperlane.ToId]; isRendered {
-				continue
-			}
-
-			pv := sgmmath.NewVector(star, hyperlane.To).ToPolar()
-			r.createPath(r.canvas, hyperlaneStyle,
-				NewPath().
-					MoveToPoint(pv.PointAtLength(2*starHalfSize)).
-					LineToPoint(pv.PointAtLength(pv.Length-2*starHalfSize)))
-		}
-
-		renderedStars[starId] = struct{}{}
-	}
-}
-
-func (r *Renderer) createPath(el *etree.Element, style Style, path Path) {
+func (r *Renderer) createPath(el *etree.Element, style Style, path Path) *etree.Element {
 	pathEl := el.CreateElement("path")
 	pathEl.CreateAttr("style", style.String())
 	pathEl.CreateAttr("d", path.String())
+	return pathEl
 }
 
-func (r *Renderer) createRect(el *etree.Element, style Style, rect sgmmath.BoundingRect) {
+func (r *Renderer) createRect(el *etree.Element, style Style, rect sgmmath.BoundingRect) *etree.Element {
 	w, h := rect.Size()
 	rectEl := el.CreateElement("rect")
 	rectEl.CreateAttr("style", style.String())
@@ -383,6 +172,29 @@ func (r *Renderer) createRect(el *etree.Element, style Style, rect sgmmath.Bound
 	rectEl.CreateAttr("y", fmt.Sprintf("%f", rect.Min.Y))
 	rectEl.CreateAttr("width", fmt.Sprintf("%f", w))
 	rectEl.CreateAttr("height", fmt.Sprintf("%f", h))
+	return rectEl
+}
+
+func (r *Renderer) createCircle(
+	el *etree.Element, style Style, center sgmmath.Point, radius float64,
+) *etree.Element {
+	circleEl := el.CreateElement("circle")
+	circleEl.CreateAttr("cx", fmt.Sprintf("%f", center.X))
+	circleEl.CreateAttr("cy", fmt.Sprintf("%f", center.Y))
+	circleEl.CreateAttr("r", fmt.Sprintf("%f", radius))
+	circleEl.CreateAttr("style", style.String())
+	return circleEl
+}
+
+func (r *Renderer) createText(
+	el *etree.Element, style Style, point sgmmath.Point, text string,
+) *etree.Element {
+	textEl := el.CreateElement("text")
+	textEl.CreateAttr("x", fmt.Sprintf("%f", point.X))
+	textEl.CreateAttr("y", fmt.Sprintf("%f", point.Y))
+	textEl.CreateAttr("style", style.String())
+	textEl.CreateText(text)
+	return textEl
 }
 
 func (r *Renderer) createIcon(el *etree.Element, p sgmmath.Point, iconName string, size float64) {
@@ -397,6 +209,11 @@ func (r *Renderer) createIcon(el *etree.Element, p sgmmath.Point, iconName strin
 	}
 
 	g.AddChild(icon.Root().Copy())
+}
+
+func (r *Renderer) createTitle(el *etree.Element, title string) {
+	titleEl := el.CreateElement("title")
+	titleEl.CreateText(title)
 }
 
 func (r *Renderer) Write(outPath string) error {

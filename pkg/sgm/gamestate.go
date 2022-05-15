@@ -17,6 +17,9 @@ type PlanetState struct {
 }
 
 type GameState struct {
+	Name string `sgm:"name"`
+	Date string `sgm:"date"`
+
 	Stars    map[StarId]*Star     `sgm:"galactic_object"`
 	Planets  PlanetState          `sgm:"planets"`
 	Bypasses map[BypassId]*Bypass `sgm:"bypasses"`

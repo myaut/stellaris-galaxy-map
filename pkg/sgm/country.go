@@ -13,9 +13,9 @@ const (
 
 	StarbaseOutpost  = "starbase_level_outpost"
 	StarbaseStarport = "starbase_level_starport"
+	StarbaseStarhold = "starbase_level_starhold"
 	StarbaseFortress = "starbase_level_starfortress"
 	StarbaseCitadel  = "starbase_level_citadel"
-	StarbaseStarhold = "starbase_level_starhold"
 
 	StarbaseMarauder   = "starbase_level_marauder"
 	StarbaseCaravaneer = "starbase_level_caravaneer"
@@ -234,4 +234,16 @@ type Fleet struct {
 	Civilian bool   `sgm:"civilian"`
 
 	MilitaryPower float64 `sgm:"military_power"`
+}
+
+func (fleet *Fleet) MilitaryPowerString() string {
+	if fleet.MilitaryPower > 5000.0 {
+		kiloPower := math.Floor(fleet.MilitaryPower / 1000.0)
+		switch {
+		case fleet.MilitaryPower > 100000.0:
+			return fmt.Sprintf("%.fK", kiloPower)
+		}
+		return fmt.Sprintf("%.1fK", kiloPower)
+	}
+	return fmt.Sprintf("%.f", fleet.MilitaryPower)
 }

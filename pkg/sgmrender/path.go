@@ -24,12 +24,7 @@ var (
 
 	outpostPath      = newStarbasePath(outpostHalfSize)
 	starbasePath     = newStarbasePath(starbaseHalfSize)
-	citadelInnerPath = newStarbasePath(starbaseHalfSize / 2)
-
-	fleetPath = NewPath().MoveTo(0.0, -fleetHalfSize).
-			LineTo(-fleetHalfSize, -fleetHalfSize/3.0).
-			LineTo(-fleetHalfSize/2.0, fleetHalfSize).HorLine(fleetHalfSize/2.0).
-			LineTo(fleetHalfSize, -fleetHalfSize/3.0).Complete()
+	citadelInnerPath = newStarbasePath(2 * starbaseHalfSize / 3)
 )
 
 func newStarbasePath(size float64) Path {
@@ -37,6 +32,13 @@ func newStarbasePath(size float64) Path {
 		MoveTo(-size, 0.0).LineTo(-size/2, 5*size/6).HorLine(size/2).
 		LineTo(size, 0.0).LineTo(size/2, -5*size/6).HorLine(-size / 2).
 		Complete()
+}
+
+func newFleetPath(off float64) Path {
+	return NewPath().MoveTo(0.0, -fleetHalfSize+off).
+		LineTo(-fleetHalfSize+off, -fleetHalfSize/3.0+off).
+		LineTo(-fleetHalfSize/2.0+off, fleetHalfSize-off).HorLine(fleetHalfSize/2.0-off).
+		LineTo(fleetHalfSize-off, -fleetHalfSize/3.0+off).Complete()
 }
 
 type PathElement struct {
@@ -51,6 +53,10 @@ type Path struct {
 
 func NewPath() Path {
 	return Path{path: make([]PathElement, 0, 8)}
+}
+
+func NewVectorPath(vec sgmmath.Vector) Path {
+	return NewPath().MoveToPoint(vec.Begin).LineToPoint(vec.End)
 }
 
 func (p Path) MoveTo(x, y float64) Path {

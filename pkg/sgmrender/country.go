@@ -78,8 +78,7 @@ func (r *Renderer) createCountryRenderer() *countryRenderer {
 		cellMap: make(map[*voronoi.Cell]*countrySegment),
 	}
 
-	// First site is (0.0, 0.0) - galaxy center
-	sites := make([]voronoi.Vertex, 1, len(r.state.Stars)+1)
+	sites := make([]voronoi.Vertex, 0, len(r.state.Stars))
 	for starId, star := range r.state.Stars {
 		vertex := voronoi.Vertex(star.Point())
 		cr.starMap[vertex] = starId
@@ -111,9 +110,6 @@ func (cr *countryRenderer) getBorderNeighbor(border *voronoi.Halfedge) (*voronoi
 func (cr *countryRenderer) initSegments() {
 	// Walk all cells and build country segments
 	for _, cell := range cr.diagram.Cells {
-		if cell.Site.X == 0.0 && cell.Site.Y == 0.0 {
-			continue
-		}
 		if _, walkedCell := cr.cellMap[cell]; walkedCell {
 			continue
 		}
@@ -414,23 +410,32 @@ func (r *Renderer) renderCountryNames(countries []countryRenderContext) {
 				lines = []string{fmt.Sprint(index)}
 			}
 
-			point = ctx.seg.bounds.Center()
+			point, foundPoint = r.findCountryNamePoint(ctx.seg, 2, 1)
+			if !foundPoint {
+				point = ctx.seg.bounds.Center()
+			}
 			style = style.With(
 				StyleOption{"font-size", fmt.Sprintf("%fpt", countryFontSize*0.75)},
 			)
 		}
 
-		y := point.Y + 1.2*countryFontSize
+		point.Y += 1.2 * countryFontSize
 		for _, line := range lines {
-			text := r.canvas.CreateElement("text")
-			text.CreateAttr("x", fmt.Sprintf("%f", point.X))
-			text.CreateAttr("y", fmt.Sprintf("%f", y))
-			text.CreateAttr("style", style.String())
-			text.CreateAttr("text-anchor", "middle")
-			text.CreateText(line)
+			textEl := r.createText(r.canvas, style, point, line)
+			textEl.CreateAttr("text-anchor", "middle")
 
-			y += countryFontSize
+			point.Y += 1.2 * countryFontSize
 		}
+	}
+
+	legendPoint := sgmmath.Point{
+		X: r.bounds.Min.X,
+		Y: r.bounds.Max.Y - float64(len(smallCountries))*0.6*countryFontSize,
+	}
+	for idx, name := range smallCountryNames {
+		r.createText(r.canvas, countryLegendStyle, legendPoint,
+			fmt.Sprintf("%d - %s", idx+1, name))
+		legendPoint.Y += 0.6 * countryFontSize
 	}
 }
 

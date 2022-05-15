@@ -188,7 +188,7 @@ func (s *Star) MobileMilitaryFleets() []*Fleet {
 	}
 
 	sort.Slice(fleets, func(i, j int) bool {
-		return fleets[i].MilitaryPower < fleets[j].MilitaryPower
+		return fleets[i].MilitaryPower > fleets[j].MilitaryPower
 	})
 	return fleets
 }
