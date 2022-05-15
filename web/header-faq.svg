@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg13323"
+   version="1.1"
+   viewBox="0 0 123.825 15.875"
+   height="60"
+   width="468">
+  <defs
+     id="defs13317" />
+  <metadata
+     id="metadata13320">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-281.125)"
+     id="layer1">
+    <g
+       id="text1011"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.30729151px;line-height:125%;font-family:'DejaVu Sans Mono';-inkscape-font-specification:'DejaVu Sans Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#f2f2f2;fill-opacity:1;stroke:#333333;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       aria-label="FAQ">
+      <path
+         id="path1013"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666622px;font-family:Orbitron;-inkscape-font-specification:Orbitron;stroke-width:0.26458332px;stroke:#333333;stroke-opacity:1;fill:#f2f2f2;fill-opacity:1"
+         d="m 3.3638763,291.58746 v -6.096 H 8.926476 v 0.6858 H 4.0496763 v 2.01507 h 3.9200664 v 0.69427 H 4.0496763 v 2.70086 z" />
+      <path
+         id="path1015"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666622px;font-family:Orbitron;-inkscape-font-specification:Orbitron;stroke-width:0.26458332px;stroke:#333333;stroke-opacity:1;fill:#f2f2f2;fill-opacity:1"
+         d="m 9.4852724,291.58746 v -5.08 q 0,-0.2794 0.1354666,-0.508 0.1354667,-0.23706 0.3640667,-0.37253 0.2370663,-0.13547 0.5164663,-0.13547 h 4.064 q 0.2794,0 0.508,0.13547 0.237067,0.13547 0.372533,0.37253 0.135467,0.2286 0.135467,0.508 v 5.08 h -0.6858 v -2.22673 h -4.7244 v 2.22673 H 9.4852724 Z m 0.6857996,-2.91253 h 4.7244 v -2.16747 q 0,-0.13546 -0.1016,-0.2286 -0.09313,-0.1016 -0.2286,-0.1016 h -4.064 q -0.135466,0 -0.237066,0.1016 -0.09313,0.0931 -0.09313,0.2286 v 2.16747 z" />
+      <path
+         id="path1017"
+         transform="matrix(0.26458333,0,0,0.26458333,0,281.125)"
+         d="m 66.314453,16.503906 c -0.704001,0 -1.355789,0.170428 -1.953125,0.511719 -0.576,0.341329 -1.033671,0.810887 -1.375,1.408203 -0.341318,0.576 -0.511719,1.215909 -0.511719,1.919922 v 15.359375 c 0,0.704013 0.17039,1.353818 0.511719,1.951172 0.341333,0.576 0.799,1.035662 1.375,1.376953 0.597336,0.34114 1.249124,0.511719 1.953125,0.511719 h 15.103516 0.255859 6.847656 v -2.591797 h -3.007812 l -0.43164,0.002 c 0.170692,-0.444501 0.43164,-0.75215 0.43164,-1.25 V 20.34375 c 0,-0.704013 -0.17039,-1.343922 -0.511719,-1.919922 -0.341333,-0.597316 -0.810871,-1.066912 -1.408203,-1.408203 -0.576,-0.341178 -1.215921,-0.511719 -1.919922,-0.511719 z m 0,2.591797 h 15.359375 c 0.341341,0 0.628611,0.126939 0.863281,0.382813 0.255988,0.23467 0.384766,0.523943 0.384766,0.865234 v 15.359375 c 0,0.341329 -0.128778,0.64061 -0.384766,0.896484 -0.234667,0.234709 -0.521952,0.351563 -0.863281,0.351563 H 66.314453 c -0.341333,0 -0.640497,-0.116854 -0.896484,-0.351563 -0.234671,-0.255987 -0.351563,-0.555193 -0.351563,-0.896484 V 20.34375 c 0,-0.341405 0.116892,-0.630526 0.351563,-0.865234 0.255998,-0.255874 0.555155,-0.382813 0.896484,-0.382813 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666622px;font-family:Orbitron;-inkscape-font-specification:Orbitron;fill:#f2f2f2;fill-opacity:1;stroke:#333333;stroke-width:0.99999994px;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

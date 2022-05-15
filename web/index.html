@@ -1,0 +1,117 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+  
+  <style>
+    body {
+      background-color: #2e4053;
+      color: #f2f2f2;
+    }
+  
+    nav, footer {
+      background-color: #212f3c;
+    }
+    
+    code {
+      background-color: #212f3c;
+      color: #f7dc6f;
+    }
+    
+    a {
+      color: #f1c40f;
+    }
+    
+    a:hover {
+      color: #f7dc6f;
+    }
+  </style>
+  
+  <script>
+    const urlUpload = "https://d5d4hhdgu8rlgdm0s5gp.apigw.yandexcloud.net/upload";
+    
+    document.addEventListener('DOMContentLoaded', function() {
+     fetch(urlUpload)
+        .then(function(response) { return response.text() }) 
+        .then(function(html) { document.getElementById('upload-form').innerHTML = html; }) 
+    }, false);  
+  </script>
+</head>
+
+<body>
+  <div style="overflow: hidden;height: 60px;">
+    <nav class="demo">
+      <a href="#" class="brand">
+        <img class="logo" src="logo.plain.svg" />
+      </a>
+    </nav>
+  </div>
+  
+  <main>
+    <div class="flex one-500 three-800">
+      <div>
+        <p>
+          <img src="header-create-map.svg" />
+        </p>
+        
+        <div id="upload-form">
+      
+        </div>
+        
+        <p>
+          <strong>Note</strong>: SGM will draw all empires regardless of your 
+          intel on them. Use with caution if you do not want to break 
+          game immersion.
+        </p>
+      </div>
+      <div>
+        <p>
+          <img src="header-faq.svg" />
+        </p>
+        
+        <h3>What Stellaris Galaxy Map does?</h3>
+        <p>
+          <strong>Stellaris Galaxy Map</strong> is an online service which draws
+          galaxy maps in SVG format from save files from a
+          <a href="https://www.paradoxinteractive.com/games/stellaris/about">
+          Stellaris</a> grand strategy game.
+        </p>
+        
+        <h3>Where do I get my save files?</h3>
+        <p>
+          Check out <a href="https://stellaris.paradoxwikis.com/Save-game_editing">
+          Save-game Editing</a> on a Stellaris wiki.
+        </p>
+        
+        <h3>What is SVG?</h3>
+        <p>
+          <strong>SVG</strong> stands for Scalable Vector Graphics. It is a 
+          file format which is used in Internet for representing images 
+          that need to be scaled without scaling artifacts (like maps).
+          It is supported by major browsers and can be edited with any 
+          vector graphics editor such as <a href="https://inkscape.org/">
+          Inkscape</a>.
+        </p>
+        
+        <h3>Can SGM be run in standalone mode?</h3>
+        <p>
+          Yes, but you will need to download sources from 
+          <a href="https://github.com/myaut/stellaris-galaxy-map">GitHub</a>
+          and run <code>stellaris-galaxy-map-cli</code> manually.
+        </p>
+      </div>
+      <div>
+        <p>
+          <img src="header-legend.svg" />
+        </p>
+      
+        <img src="legend.plain.svg" width="100%" />
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <a href="https://github.com/myaut/stellaris-galaxy-map">GitHub</a> |
+    DM <a href="https://www.reddit.com/user/myaut">/u/myaut</a> on Reddit
+  </footer>
+</body>
+</html>

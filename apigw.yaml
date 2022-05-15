@@ -1,0 +1,19 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Stellaris Galaxy Map API
+paths:
+  /upload:
+    get:
+      operationId: upload
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4epjth7l1h1jkv9kurk
+        service_account_id: ajeuf0r0qsfhm4drg90e
+  /render:
+    post:
+      operationId: render
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e9hfvt317cm7jm1sgt
+        service_account_id: ajeuf0r0qsfhm4drg90e

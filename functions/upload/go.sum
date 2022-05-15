@@ -1,0 +1,12 @@
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515222714-af6d582d011d h1:2N5b5avr2/cfiZY8MgXmElApxOd9ekQCRzN8pkyJ7HA=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515222714-af6d582d011d/go.mod h1:xUps1Qh6dM7SpbiKTlrsLfWG6zMEVs+Az2Y3CuhMxQk=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515223641-280d3dfd5968 h1:8fVrBQ1Eyhk2DndHi6ooPyeSaTXjxwaDRHGCMT5++38=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515223641-280d3dfd5968/go.mod h1:xUps1Qh6dM7SpbiKTlrsLfWG6zMEVs+Az2Y3CuhMxQk=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515231742-79f38dac16f7 h1:0YN2tU9C1ed1HgAHjNTL4hkPXLhGbvWsF9tZws3OcZI=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515231742-79f38dac16f7/go.mod h1:xUps1Qh6dM7SpbiKTlrsLfWG6zMEVs+Az2Y3CuhMxQk=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515231949-e945224cc372 h1:gk4NUXIPRFgfvv7AhNBFpgzhsiCece9KVshH4YeCjL0=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515231949-e945224cc372/go.mod h1:xUps1Qh6dM7SpbiKTlrsLfWG6zMEVs+Az2Y3CuhMxQk=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515232243-e0998eb83b7b h1:Mh7wSzYnMhIziuhszqRLkQiGFDQu2J3y3wd2GK1UWFE=
+github.com/myaut/go-s3presigned-post v0.0.0-20220515232243-e0998eb83b7b/go.mod h1:xUps1Qh6dM7SpbiKTlrsLfWG6zMEVs+Az2Y3CuhMxQk=
