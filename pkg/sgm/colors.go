@@ -4,7 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmparser"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmparser"
 
 	"github.com/YashdalfTheGray/colorcode"
 )

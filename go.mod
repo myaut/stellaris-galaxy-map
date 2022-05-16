@@ -1,4 +1,4 @@
-module github.com/myaut/stellaris-galaxy-mod
+module github.com/myaut/stellaris-galaxy-map
 
 go 1.16
 

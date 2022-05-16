@@ -7,8 +7,8 @@ import (
 
 	"github.com/beevik/etree"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgm"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmmath"
 )
 
 const (
@@ -218,4 +218,8 @@ func (r *Renderer) createTitle(el *etree.Element, title string) {
 
 func (r *Renderer) Write(outPath string) error {
 	return r.doc.WriteToFile(outPath)
+}
+
+func (r *Renderer) WriteToBytes() ([]byte, error) {
+	return r.doc.WriteToBytes()
 }

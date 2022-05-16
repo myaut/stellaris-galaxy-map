@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgm"
 )
 
 const (

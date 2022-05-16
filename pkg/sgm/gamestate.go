@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmparser"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmparser"
 )
 
 type StarbaseMgr struct {

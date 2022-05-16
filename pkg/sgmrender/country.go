@@ -9,8 +9,8 @@ import (
 
 	"github.com/pzsz/voronoi"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgm"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmmath"
 )
 
 type countrySegFlag uint

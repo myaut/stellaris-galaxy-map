@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmmath"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmmath"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgm"
-	"github.com/myaut/stellaris-galaxy-mod/pkg/sgmrender"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgm"
+	"github.com/myaut/stellaris-galaxy-map/pkg/sgmrender"
 )
 
 func main() {
