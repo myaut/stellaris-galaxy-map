@@ -33,7 +33,7 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 		ctx.g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", p.X, p.Y))
 
 		// Render starbase if one exists, otherwise render
-		if star.Starbase == nil || !star.IsSignificant() {
+		if star.PrimaryStarbase() == nil || !star.IsSignificant() {
 			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
 			continue
 		}
@@ -44,23 +44,24 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 }
 
 func (r *Renderer) renderStarbase(ctx *starRenderContext) {
-	if ctx.star.Starbase.Level == sgm.StarbaseOutpost {
+	starbase := ctx.star.PrimaryStarbase()
+	if starbase.Level == sgm.StarbaseOutpost {
 		r.createPath(ctx.g, outpostStyle, outpostPath)
 		ctx.iconOffset = outpostHalfSize
 	} else {
 		style := baseStarbaseStyle
-		starbaseStroke := starbaseStrokes[ctx.star.Starbase.Level]
+		starbaseStroke := starbaseStrokes[starbase.Level]
 		if starbaseStroke > 0.0 {
 			style = style.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", starbaseStroke)})
 		}
 		r.createPath(ctx.g, style, starbasePath)
 		ctx.iconOffset = starbaseHalfSize + starbaseStroke
 
-		if ctx.star.Starbase.Level == sgm.StarbaseCitadel {
+		if starbase.Level == sgm.StarbaseCitadel {
 			r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
 		}
 
-		role := ctx.star.Starbase.Role()
+		role := starbase.Role()
 		if role != sgm.StarbaseRoleMax {
 			rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
 			r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
@@ -162,7 +163,7 @@ func (r *Renderer) renderFleet(ctx *starRenderContext, point sgmmath.Point, flee
 	g := ctx.g.CreateElement("g")
 	g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", point.X, point.Y))
 	pathEl := r.createPath(g, style, newFleetPath(fleetStrength/2))
-	r.createTitle(pathEl, fmt.Sprintf("%s (%s)", fleet.Name, fleet.MilitaryPowerString()))
+	r.createTitle(pathEl, fmt.Sprintf("%s (%s)", fleet.Name(), fleet.MilitaryPowerString()))
 }
 
 func (r *Renderer) renderMegastructure(
@@ -202,7 +203,7 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 		radius -= 0.1
 	}
 
-	title := fmt.Sprintf("%s (%d pops)", planet.Name, planet.EmployablePops)
+	title := fmt.Sprintf("%s (%d pops)", planet.Name(), planet.EmployablePops)
 	r.createTitle(r.createCircle(ctx.g, style, center, radius), title)
 	if planet.EmployablePops > 75 {
 		r.createTitle(r.createCircle(ctx.g, basePlanetStyle, center, radius/2), title)
@@ -218,7 +219,7 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 func (r *Renderer) renderStarName(ctx *starRenderContext) {
 	var textAnchor string
 	point := ctx.star.Point()
-	name := ctx.star.Name
+	name := ctx.star.Name()
 	if strings.HasPrefix(name, "NAME_") {
 		name = strings.ReplaceAll(name[5:], "_", " ")
 	}

@@ -2,6 +2,7 @@ package sgmparser
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -107,19 +108,25 @@ func (p *Parser) parseMap(v reflect.Value) error {
 	return nil
 }
 
-func (p *Parser) getFields(v reflect.Value) map[string]reflect.Value {
+func (p *Parser) prepareFields(v reflect.Value) map[string]reflect.Value {
 	fields := make(map[string]reflect.Value)
 	for fieldIdx := 0; fieldIdx < v.NumField(); fieldIdx++ {
 		fieldDef := v.Type().Field(fieldIdx)
 		if tag, ok := fieldDef.Tag.Lookup("sgm"); ok {
-			fields[tag] = v.Field(fieldIdx)
+			field := v.Field(fieldIdx)
+			if strings.HasSuffix(tag, ",id") {
+				tag = tag[:len(tag)-3]
+				field.SetUint(math.MaxUint32)
+			}
+
+			fields[tag] = field
 		}
 	}
 	return fields
 }
 
 func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error {
-	fields := p.getFields(v)
+	fields := p.prepareFields(v)
 	for token := range p.tokenizer.C {
 		if token.Type == terminalTokenType {
 			return nil
@@ -140,6 +147,12 @@ func (p *Parser) parseStruct(terminalTokenType TokenType, v reflect.Value) error
 				p.ignoreComplexValue()
 			}
 			continue
+		}
+
+		if valueToken.Type == TokenCollectionStart && field.Kind() != reflect.Struct {
+			if structField, hasStruct := fields[token.Value+",struct"]; hasStruct {
+				field = structField
+			}
 		}
 
 		err := p.parseValue(valueToken, field)
@@ -231,7 +244,7 @@ func (p *Parser) parseValue(valueToken Token, v reflect.Value) error {
 		}
 	case reflect.Struct:
 		if valueToken.Type == TokenIdentifier {
-			fields := p.getFields(v)
+			fields := p.prepareFields(v)
 			if field, fieldOk := fields[valueToken.Value]; fieldOk {
 				nextToken := <-p.tokenizer.C
 				return p.parseValue(nextToken, field)

@@ -59,12 +59,19 @@ func LoadGameState(path string) (*GameState, error) {
 			}
 		}
 
-		if star.StarbaseId != DefaultStarbaseId {
-			star.Starbase = state.StarbaseMgr.Starbases[star.StarbaseId]
-			if star.Starbase != nil {
-				star.Starbase.Star = star
+		if len(star.StarbaseIds) == 0 {
+			star.StarbaseIds = []StarbaseId{star.StarbaseId}
+		}
+		for _, starbaseId := range star.StarbaseIds {
+			if starbaseId == DefaultStarbaseId {
+				continue
+			}
+			starbase := state.StarbaseMgr.Starbases[starbaseId]
+			if starbase != nil {
+				star.Starbases = append(star.Starbases, starbase)
+				starbase.Star = star
 			} else {
-				log.Printf("error: starbase #%d is not found", star.StarbaseId)
+				log.Printf("error: starbase #%d is not found", starbaseId)
 			}
 		}
 

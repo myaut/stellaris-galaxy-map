@@ -29,17 +29,19 @@ var DefaultStarId = StarId(math.MaxUint32)
 type StarId int
 type Star struct {
 	Type        string `sgm:"type"`
-	Name        string `sgm:"name"`
+	NameString  string `sgm:"name"`
+	NameStruct  Name   `sgm:"name,struct"`
 	Initializer string `sgm:"initializer"`
 
 	Coordinate Coordinate  `sgm:"coordinate"`
 	Hyperlanes []Hyperlane `sgm:"hyperlane"`
 
-	SectorId SectorId `sgm:"sector"`
+	SectorId SectorId `sgm:"sector,id"`
 	Sector   *Sector
 
-	StarbaseId StarbaseId `sgm:"starbase"`
-	Starbase   *Starbase
+	StarbaseId  StarbaseId   `sgm:"starbase,id"`
+	StarbaseIds []StarbaseId `sgm:"starbases"`
+	Starbases   []*Starbase
 
 	PlanetIds []PlanetId `sgm:"planet"`
 	Planets   []*Planet
@@ -54,22 +56,33 @@ type Star struct {
 	Fleets   []*Fleet
 }
 
+func (s *Star) Name() string {
+	if s.NameString == "" {
+		s.NameString = s.NameStruct.Resolve()
+	}
+	return s.NameString
+}
+
 func (s *Star) Point() sgmmath.Point {
 	return sgmmath.Point{X: -s.Coordinate.X, Y: s.Coordinate.Y}
 }
 
+func (s *Star) PrimaryStarbase() *Starbase {
+	if len(s.Starbases) == 0 {
+		return nil
+	}
+	return s.Starbases[0]
+}
+
 func (s *Star) Owner() CountryId {
-	if s.Starbase == nil {
+	if s.Sector == nil {
 		return DefaultCountryId
 	}
-	return s.Starbase.Owner
+	return s.Sector.Owner
 }
 
 func (s *Star) IsOwnedBy(countryId CountryId) bool {
-	if s.Starbase == nil {
-		return false
-	}
-	return s.Starbase.Owner == countryId
+	return s.Owner() == countryId
 }
 
 func (s *Star) Bypasses() (bypasses []string) {
@@ -155,7 +168,7 @@ func (s *Star) IsSignificant() bool {
 }
 
 func (s *Star) HasUpgradedStarbase() bool {
-	return s.Starbase != nil && s.Starbase.Level != StarbaseOutpost
+	return len(s.Starbases) > 0 && s.Starbases[0].Level != StarbaseOutpost
 }
 
 func (s *Star) HasPops() bool {
@@ -225,7 +238,10 @@ type PlanetId uint32
 type Planet struct {
 	Star *Star
 
-	Name        string `sgm:"name"`
+	NameString string `sgm:"name"`
+	NameStruct struct {
+		Key string `sgm:"key"`
+	} `sgm:"name,struct"`
 	Class       string `sgm:"planet_class"`
 	Designation string `sgm:"final_designation"`
 
@@ -237,4 +253,11 @@ type Planet struct {
 
 func (p *Planet) IsHabitat() bool {
 	return p.Class == PlanetClassHabitat
+}
+
+func (p *Planet) Name() string {
+	if p.NameString != "" {
+		return p.NameString
+	}
+	return p.NameStruct.Key
 }

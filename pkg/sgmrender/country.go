@@ -392,10 +392,10 @@ func (r *Renderer) renderCountryNames(countries []countryRenderContext) {
 	smallCountries := make(map[sgm.CountryId]int)
 
 	for _, ctx := range countries {
-		lines, maxLineLength := []string{ctx.country.Name}, len(ctx.country.Name)
+		lines, maxLineLength := []string{ctx.country.Name()}, len(ctx.country.Name())
 		rectW, _ := ctx.seg.bounds.Size()
 		if float64(maxLineLength)*countryFontSize > 0.8*rectW {
-			lines, maxLineLength = r.countryNameLines(ctx.country.Name)
+			lines, maxLineLength = r.countryNameLines(ctx.country.Name())
 		}
 
 		point, foundPoint := r.findCountryNamePoint(ctx.seg, maxLineLength, len(lines))
@@ -406,7 +406,7 @@ func (r *Renderer) renderCountryNames(countries []countryRenderContext) {
 			} else {
 				index := len(smallCountryNames) + 1
 				smallCountries[ctx.seg.countryId] = index
-				smallCountryNames = append(smallCountryNames, ctx.country.Name)
+				smallCountryNames = append(smallCountryNames, ctx.country.Name())
 				lines = []string{fmt.Sprint(index)}
 			}
 

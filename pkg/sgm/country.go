@@ -112,7 +112,7 @@ type Starbase struct {
 	Level     string         `sgm:"level"`
 	Modules   map[int]string `sgm:"modules"`
 	Buildings map[int]string `sgm:"buildings"`
-	Owner     CountryId      `sgm:"owner"`
+	Owner     CountryId      `sgm:"owner,id"`
 
 	Star *Star
 }
@@ -176,24 +176,44 @@ var DefaultCountryId = CountryId(math.MaxUint32)
 
 type CountryId uint32
 type Country struct {
-	Name string `sgm:"name"`
+	NameString string `sgm:"name"`
+	NameStruct Name   `sgm:"name,struct"`
 
 	Flag CountryFlag `sgm:"flag"`
+}
+
+func (c *Country) Name() string {
+	if c.NameString == "" {
+		c.NameString = c.NameStruct.Format(CountryNameFormats)
+	}
+	return c.NameString
 }
 
 var DefaultSectorId = SectorId(math.MaxUint32)
 
 type SectorId uint32
 type Sector struct {
-	Name string `sgm:"name"`
-	Type string `sgm:"type"`
+	NameString string `sgm:"name"`
+	NameStruct struct {
+		Key string `sgm:"key"`
+	} `sgm:"name,struct"`
+
+	Type  string    `sgm:"type"`
+	Owner CountryId `sgm:"owner,id"`
+}
+
+func (s *Sector) Name() string {
+	if s.NameString != "" {
+		return s.NameString
+	}
+	return s.NameStruct.Key
 }
 
 type MegastructureId uint32
 type Megastructure struct {
 	Type     string   `sgm:"type"`
 	Owner    int      `sgm:"owner"`
-	PlanetId PlanetId `sgm:"planet"`
+	PlanetId PlanetId `sgm:"planet,id"`
 
 	Star   *Star
 	Planet *Planet
@@ -218,7 +238,7 @@ type CountryFlag struct {
 
 func CountryName(countryId CountryId, country *Country) string {
 	if country != nil {
-		return country.Name
+		return country.Name()
 	}
 	if countryId == DefaultCountryId {
 		return "_default"
@@ -228,12 +248,23 @@ func CountryName(countryId CountryId, country *Country) string {
 
 type FleetId uint32
 type Fleet struct {
-	Name     string `sgm:"name"`
-	Station  bool   `sgm:"station"`
-	Mobile   bool   `sgm:"mobile"`
-	Civilian bool   `sgm:"civilian"`
+	NameString string `sgm:"name"`
+	NameStruct struct {
+		Key string `sgm:"key"`
+	} `sgm:"name,struct"`
+
+	Station  bool `sgm:"station"`
+	Mobile   bool `sgm:"mobile"`
+	Civilian bool `sgm:"civilian"`
 
 	MilitaryPower float64 `sgm:"military_power"`
+}
+
+func (f *Fleet) Name() string {
+	if f.NameString != "" {
+		return f.NameString
+	}
+	return f.NameStruct.Key
 }
 
 func (fleet *Fleet) MilitaryPowerString() string {

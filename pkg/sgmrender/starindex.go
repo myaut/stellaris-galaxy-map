@@ -89,7 +89,7 @@ func (r *Renderer) buildStarIndex() {
 				}
 
 				if traceFlags&traceFlagStarIndex != 0 {
-					log.Printf("AdjNode: %s -> %s (angle: %f)\n", star.Name, adjStar.Name, pv.Angle)
+					log.Printf("AdjNode: %s -> %s (angle: %f)\n", star.Name(), adjStar.Name(), pv.Angle)
 				}
 				adjList = append(adjList, StarAdjacency{
 					AdjStarId: adjStarId,
@@ -141,7 +141,7 @@ func (r *Renderer) pickTextQuadrant(starId sgm.StarId) int {
 	}
 
 	if traceFlags&traceFlagStarIndex != 0 {
-		log.Printf("TextQuadrant: %s - %v -> %v\n", r.state.Stars[starId].Name,
+		log.Printf("TextQuadrant: %s - %v -> %v\n", r.state.Stars[starId].Name(),
 			quadrantWeight, minQuadrant-2)
 	}
 	return minQuadrant - 2

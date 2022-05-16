@@ -16,6 +16,13 @@
       
     let mapView = null;
     
+    function setSvg(text) {
+      mapView.innerHTML = text
+      
+      document.getElementById("share-map").setAttribute('value', shareUrl + savKey);
+      document.getElementById("share-direct").setAttribute('value', mapBucket + mapKey);
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {  
       mapView = document.getElementById('map-view');
     
@@ -24,21 +31,16 @@
         credentials: 'omit',
       }).then(function(response) {
         if (response.status == 404) {
-          return fetch(urlRender + "?key=" + savKey, {
+          fetch(urlRender + "?key=" + savKey, {
             method: 'POST',  
             mode: 'no-cors',
             credentials: 'omit',
-          }).then(function(response) {
-            return response.text()
-          }) 
+          }).then((response) => {   
+            response.text().then(setSvg(text))
+          })
         } else if (response.ok) {  
-          return response.text()
+          response.text().then(setSvg)
         }
-      }).then(function (svg) {
-        mapView.innerHTML = svg
-        
-        document.getElementById("share-map").setAttribute('value', shareUrl + savKey);
-        document.getElementById("share-direct").setAttribute('value', mapBucket + mapKey);
       })
     
       let mapPoint = null
@@ -81,14 +83,13 @@
   
   <main>
     <div class="fit">
-      <div class="flex four">
+      <div class="flex three">
         <div>
-          <label>Share Map:</label>
-          <input type="text" id="share-map" width="48%" />
         </div>
         <div>
-          <label>Share Direct:</label>
-          <input type="text" id="share-direct" width="48%" />
+          <label>Zoom:</label>
+          <input type="range" id="zoom" name="zoom" class="slider"
+                 min="50" max="150" value="100" step="5" oninput="zoomImage(this)" />
         </div>
         <div>
           <label for="legend-modal" class="button" style="float: right;">
@@ -109,15 +110,18 @@
             </article>
           </div>
         </div>
-        <div>
-          <label>Zoom:</label>
-          <input type="range" id="zoom" name="zoom" class="slider"
-                 min="50" max="150" value="100" step="5" oninput="zoomImage(this)" />
-        </div>
       </div>
     </div>
   
     <div class="fit map" id="map-view">
+    </div>
+    
+    <div>
+      <label>Share Map:</label>
+      <input type="text" id="share-map" />
+      
+      <label>Share Direct:</label>
+      <input type="text" id="share-direct" />
     </div>
   </main>
   
