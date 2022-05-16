@@ -76,6 +76,10 @@ func (s *Star) PrimaryStarbase() *Starbase {
 
 func (s *Star) Owner() CountryId {
 	if s.Sector == nil {
+		starbase := s.PrimaryStarbase()
+		if starbase != nil {
+			return starbase.Owner
+		}
 		return DefaultCountryId
 	}
 	return s.Sector.Owner

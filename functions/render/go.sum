@@ -44,6 +44,8 @@ github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHW
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
 github.com/myaut/stellaris-galaxy-map v0.0.0-20220516001210-990124bf5a7c h1:jr3RSFL4HFdxWLvIeeCvjMGqc+OKFJ2CwGrmOYbgNQ4=
 github.com/myaut/stellaris-galaxy-map v0.0.0-20220516001210-990124bf5a7c/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220516221442-4b79987c3b2a h1:qdgCygJ9F7C3imW/q1Cw4UEDzbtljVmPttvfPGIBXTk=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220516221442-4b79987c3b2a/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f h1:YeUeWAPTrycaikVXiVoAu1dxIR4+tSsn9IbTkNfRsss=

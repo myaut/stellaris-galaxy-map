@@ -51,8 +51,9 @@ input[type="file"] {
 
 div.map {
 	overflow: hidden;
-	height: 80vh;
+	height: 80%;
 	cursor: crosshair;
+	touch-action: none;
 }
 
 .slider {

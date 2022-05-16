@@ -44,19 +44,31 @@
       })
     
       let mapPoint = null
-      mapView.addEventListener('mousedown', (e) => {
-        mapPoint = {X: e.offsetX, Y: e.offsetY}
-      })
-      mapView.addEventListener('mouseup', (e) => {
-        mapPoint = null
-      })
-      mapView.addEventListener('mousemove', (e) => {
+      function dragStart(x, y) {
+        mapPoint = {X: x, Y: y}
+      }
+      function doDragMap(x, y) {
         if (mapPoint != null) {
-          mapView.scrollLeft -= (e.offsetX - mapPoint.X)  
-          mapView.scrollTop -= (e.offsetY - mapPoint.Y)  
-          mapPoint = {X: e.offsetX, Y: e.offsetY}
+          mapView.scrollLeft -= (x - mapPoint.X)  
+          mapView.scrollTop -= (y - mapPoint.Y)  
+          mapPoint = {X: x, Y: y}
         }
-      })
+      }
+      function dragEnd() {
+        mapPoint = null
+      }
+      
+      mapView.addEventListener('mousedown', 
+        (e) => dragStart(e.offsetX, e.offsetY))
+      mapView.addEventListener('mousemove', 
+        (e) => doDragMap(e.offsetX, e.offsetY))  
+      mapView.addEventListener('mouseup', (e) => dragEnd())  
+        
+      mapView.addEventListener('touchstart', 
+        (e) => dragStart(e.touches[0].clientX, e.touches[0].clientY))
+      mapView.addEventListener('touchmove', 
+        (e) => doDragMap(e.touches[0].clientX, e.touches[0].clientY))
+      mapView.addEventListener('touchend', (e) => dragEnd())  
     }, false); 
     
     function svg() {
