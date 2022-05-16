@@ -52,6 +52,7 @@
           mapView.scrollLeft -= (x - mapPoint.X)  
           mapView.scrollTop -= (y - mapPoint.Y)  
           mapPoint = {X: x, Y: y}
+          console.log(mapPoint)
         }
       }
       function dragEnd() {
@@ -59,9 +60,9 @@
       }
       
       mapView.addEventListener('mousedown', 
-        (e) => dragStart(e.offsetX, e.offsetY))
+        (e) => dragStart(e.clientX, e.clientY))
       mapView.addEventListener('mousemove', 
-        (e) => doDragMap(e.offsetX, e.offsetY))  
+        (e) => doDragMap(e.clientX, e.clientY))  
       mapView.addEventListener('mouseup', (e) => dragEnd())  
         
       mapView.addEventListener('touchstart', 
