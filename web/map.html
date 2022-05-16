@@ -1,0 +1,129 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+  <link rel="stylesheet" href="./sgm.css">
+  
+  <script>
+    const urlRender = "https://d5d4hhdgu8rlgdm0s5gp.apigw.yandexcloud.net/render";
+    const mapBucket = "https://storage.yandexcloud.net/sgm-maps/";
+    const shareUrl = "https://stellaris-galaxy-map.website.yandexcloud.net/map.html?key=";
+    
+    let params = new URLSearchParams(window.location.search);
+    const savKey = params.get("key");
+    const mapKey = savKey.replace(".sav", ".svg");
+    
+    const svgSize = 2160;
+      
+    let mapView = null;
+    
+    document.addEventListener('DOMContentLoaded', function() {  
+      mapView = document.getElementById('map-view');
+    
+      fetch(mapBucket + mapKey, {
+        method: 'GET',
+        credentials: 'omit',
+      }).then(function(response) {
+        if (response.status == 404) {
+          return fetch(urlRender + "?key=" + savKey, {
+            method: 'POST',  
+            mode: 'no-cors',
+            credentials: 'omit',
+          }).then(function(response) {
+            return response.text()
+          }) 
+        } else if (response.ok) {  
+          return response.text()
+        }
+      }).then(function (svg) {
+        mapView.innerHTML = svg
+        
+        document.getElementById("share-map").setAttribute('value', shareUrl + savKey);
+        document.getElementById("share-direct").setAttribute('value', mapBucket + mapKey);
+      })
+    
+      let mapPoint = null
+      mapView.addEventListener('mousedown', (e) => {
+        mapPoint = {X: e.offsetX, Y: e.offsetY}
+      })
+      mapView.addEventListener('mouseup', (e) => {
+        mapPoint = null
+      })
+      mapView.addEventListener('mousemove', (e) => {
+        if (mapPoint != null) {
+          mapView.scrollLeft -= (e.offsetX - mapPoint.X)  
+          mapView.scrollTop -= (e.offsetY - mapPoint.Y)  
+          mapPoint = {X: e.offsetX, Y: e.offsetY}
+        }
+      })
+    }, false); 
+    
+    function svg() {
+      return mapView.getElementsByTagName('svg')[0];
+    }
+    
+    function zoomImage(zoom) {
+      const size = svgSize*zoom.value/100;
+      
+      svg().setAttribute('width', `${size}`)
+      svg().setAttribute('height', `${size}`)
+    }
+  </script>
+</head>
+
+<body>
+  <div style="overflow: hidden;height: 60px;">
+    <nav class="demo">
+      <a href="/" class="brand">
+        <img class="logo" src="logo.plain.svg" />
+      </a>
+    </nav>
+  </div>
+  
+  <main>
+    <div class="fit">
+      <div class="flex four">
+        <div>
+          <label>Share Map:</label>
+          <input type="text" id="share-map" width="48%" />
+        </div>
+        <div>
+          <label>Share Direct:</label>
+          <input type="text" id="share-direct" width="48%" />
+        </div>
+        <div>
+          <label for="legend-modal" class="button" style="float: right;">
+            Legend
+          </label>
+          
+          <div class="modal">
+            <input id="legend-modal" type="checkbox" />
+            <label for="legend-modal" class="overlay"></label>
+            <article>
+              <header>
+                <h3>Legend</h3>
+                <label for="legend-modal" class="close">&times;</label>
+              </header>
+              <section class="content">
+                <img src="legend.plain.svg" width="100%" />
+              </section>
+            </article>
+          </div>
+        </div>
+        <div>
+          <label>Zoom:</label>
+          <input type="range" id="zoom" name="zoom" class="slider"
+                 min="50" max="150" value="100" step="5" oninput="zoomImage(this)" />
+        </div>
+      </div>
+    </div>
+  
+    <div class="fit map" id="map-view">
+    </div>
+  </main>
+  
+  <footer>
+    <a href="https://github.com/myaut/stellaris-galaxy-map">GitHub</a> |
+    Made by <a href="https://www.reddit.com/user/myaut">/u/myaut</a>
+  </footer>
+</body>
+</html>

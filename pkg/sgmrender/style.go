@@ -10,6 +10,9 @@ import (
 const (
 	countryFontSize = 8.0
 
+	colorPrimaryStroke = "#212f3c"
+	colorPrimaryFill   = "#f2f2f2"
+
 	colorStationStroke = "#2e4053"
 	colorStationFill   = "#aeb6bf"
 
@@ -31,8 +34,8 @@ var (
 	)
 
 	hyperlaneStyle = NewStyle(
-		StyleOption{"stroke-width", "0.8pt"},
-		StyleOption{"stroke", "#d5dbdb"},
+		StyleOption{"stroke-width", "0.33pt"},
+		StyleOption{"stroke", colorPrimaryStroke},
 	)
 
 	defaultStarStyle = NewStyle(
@@ -76,8 +79,8 @@ var (
 		StyleOption{"font-family", "sans-serif"},
 		StyleOption{"font-size", "3.6pt"},
 		StyleOption{"stroke-width", "0.08pt"},
-		StyleOption{"stroke", "white"},
-		StyleOption{"fill", "black"},
+		StyleOption{"stroke", colorPrimaryStroke},
+		StyleOption{"fill", colorPrimaryFill},
 	)
 
 	countryTextStyle = NewStyle(
@@ -85,8 +88,8 @@ var (
 		StyleOption{"stroke-width", "0.12pt"},
 		StyleOption{"font-size", fmt.Sprintf("%fpt", countryFontSize)},
 		StyleOption{"font-variant", "petite-caps"},
-		StyleOption{"stroke", "white"},
-		StyleOption{"fill", "black"},
+		StyleOption{"stroke", colorPrimaryStroke},
+		StyleOption{"fill", colorPrimaryFill},
 	)
 
 	countryLegendStyle = countryTextStyle.With(

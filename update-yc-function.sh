@@ -1,10 +1,11 @@
 #!/bin/bash 
 
+FUNC=$1
+
 DIR=$(dirname $0)
 . $DIR/awssecret.sh
 AUTHENV=AWS_REGION=$AWS_REGION,AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY 
 
-FUNC=$1
 case $FUNC in
 	apigw)
 		yc serverless api-gateway update --spec $DIR/apigw.yaml d5d4hhdgu8rlgdm0s5gp

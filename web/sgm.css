@@ -1,0 +1,78 @@
+body {
+	--color-background-primary: #2e4053;
+	--color-background-primary-dark: #212f3c;
+	
+	--color-primary: #f2f2f2;
+	--color-highlight: #f1c40f;
+	--color-highlight-bright: #f1c40f;
+	
+	background-color: var(--color-background-primary);
+	color: var(--color-primary);
+}
+
+nav, footer {
+	background-color: var(--color-background-primary-dark);
+}
+
+.modal > .overlay ~ *, .card {
+	background-color: var(--color-background-primary-dark);
+}
+
+
+code {
+	background-color: var(--color-background-primary-dark);
+}
+
+a {
+	color: var(--color-highlight);
+}
+
+a:hover {
+	color: var(--color-highlight-bright);
+}
+
+.button, input[type="submit"] {
+	background-color: var(--color-background-primary-dark);
+	color: var(--color-highlight);
+}
+
+.button:hover, input[type="submit"]:hover {
+	color: var(--color-highlight-bright);
+}
+
+input[type="text"] {
+	background-color: var(--color-background-primary-dark);
+}
+
+input[type="file"] {
+	background-color: var(--color-highlight-bright);
+	color: var(--color-background-primary-dark);
+}
+
+div.map {
+	overflow: hidden;
+	height: 80vh;
+	cursor: crosshair;
+}
+
+.slider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 25px;
+	background: var(--color-background-primary-dark);
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb,
+.slider::-moz-range-thumb {
+	-webkit-appearance: none;
+  	appearance: none;
+	width: 25px;
+	height: 25px;
+	background: var(--color-highlight);
+	cursor: pointer;
+}

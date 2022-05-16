@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 4.2333333 4.2333333"
+   width="16"
    height="16"
-   width="16">
+   viewBox="0 0 4.2333333 4.2333333"
+   version="1.1"
+   id="svg8">
   <defs
      id="defs2" />
   <metadata
@@ -25,17 +25,17 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="fill:#7137c8;fill-opacity:1;stroke:#2d1650;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;"
+     id="path1894-6-7-4-3"
      d="M 2.1166667,4.23333 1.8520833,3.43958 H 1.5874998 L 1.0583341,3.96874 0.2645836,2.38124 1.82327,3.14803 2.1166667,2.91041 2.439665,3.14803 3.9687499,2.38124 3.1750007,3.96874 2.6458337,3.43958 H 2.3812502 Z"
-     id="path1894-6-7-4-3" />
+     style="fill:#aa87de;fill-opacity:1;stroke:#5a2ca0;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
   <path
-     style="fill:#7137c8;fill-opacity:1;stroke:#2d1650;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     id="path1894-6-7-4-3-3"
      d="M 2.1166667,0 1.8520833,0.79375 H 1.5874998 L 1.058334,0.26459 0.26458351,1.85209 1.82327,1.0853 2.1166667,1.32292 2.439665,1.0853 3.9687499,1.85209 3.1750007,0.26459 2.6458337,0.79375 H 2.3812502 Z"
-     id="path1894-6-7-4-3-3" />
+     style="fill:#aa87de;fill-opacity:1;stroke:#5a2ca0;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
   <circle
-     r="0.65956682"
-     cy="2.1214511"
-     cx="2.1055403"
+     style="opacity:1;vector-effect:none;fill:#aa87de;fill-opacity:1;stroke:#5a2ca0;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="path817"
-     style="opacity:1;vector-effect:none;fill:#7137c8;fill-opacity:1;stroke:#2d1650;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+     cx="2.1055403"
+     cy="2.1214511"
+     r="0.65956682" />
 </svg>
