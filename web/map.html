@@ -15,33 +15,40 @@
     const svgSize = 2160;
       
     let mapView = null;
-    
-    function setSvg(text) {
-      mapView.innerHTML = text
-      
-      document.getElementById("share-map").setAttribute('value', shareUrl + savKey);
-      document.getElementById("share-direct").setAttribute('value', mapBucket + mapKey);
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {  
-      mapView = document.getElementById('map-view');
-    
+    let loadRetries = 1;
+    function doLoadMap() {
       fetch(mapBucket + mapKey, {
         method: 'GET',
         credentials: 'omit',
       }).then(function(response) {
         if (response.status == 404) {
+          if (loadRetries == 0) {
+            return 
+          }
+          loadRetries--
+          
           fetch(urlRender + "?key=" + savKey, {
             method: 'POST',  
             mode: 'no-cors',
             credentials: 'omit',
           }).then((response) => {   
-            response.text().then(setSvg(text))
+            doLoadMap()
           })
-        } else if (response.ok) {  
-          response.text().then(setSvg)
+        } else if (response.ok) {
+          response.text().then(function(text) {
+            mapView.innerHTML = text
+            
+            document.getElementById("share-map").setAttribute('value', shareUrl + savKey);
+            document.getElementById("share-direct").setAttribute('value', mapBucket + mapKey);
+          })
         }
       })
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {  
+      mapView = document.getElementById('map-view');
+    
+      doLoadMap()  
     
       let mapPoint = null
       function dragStart(x, y) {
