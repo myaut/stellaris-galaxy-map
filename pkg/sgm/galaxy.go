@@ -208,7 +208,7 @@ func (s *Star) IsDistant() bool {
 func (s *Star) MobileMilitaryFleets() []*Fleet {
 	var fleets []*Fleet
 	for _, fleet := range s.Fleets {
-		if !fleet.Civilian && fleet.Mobile {
+		if !fleet.Civilian && fleet.Mobile && !fleet.IsTransport() {
 			fleets = append(fleets, fleet)
 		}
 	}

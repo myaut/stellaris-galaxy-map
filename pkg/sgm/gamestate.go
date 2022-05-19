@@ -77,6 +77,20 @@ func LoadGameState(path string) (*GameState, error) {
 			log.Printf("warn: starbase #%d is nil", starbaseId)
 		}
 	}
+	for _, fleet := range state.Fleets {
+		if fleet == nil {
+			continue
+		}
+
+		if fleet.Owner == nil {
+			fleet.Owner = state.Countries[fleet.OwnerId]
+		}
+		for _, shipId := range fleet.ShipIds {
+			if ship := state.Ships[shipId]; ship != nil {
+				fleet.Ships = append(fleet.Ships, ship)
+			}
+		}
+	}
 	for shipId, ship := range state.Ships {
 		if ship != nil {
 			ship.Fleet = state.Fleets[ship.FleetId]

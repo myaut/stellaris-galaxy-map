@@ -13,14 +13,14 @@ const (
 	colorPrimaryStroke = "#212f3c"
 	colorPrimaryFill   = "#f2f2f2"
 
-	colorStationStroke = "#2e4053"
-	colorStationFill   = "#aeb6bf"
+	colorFleetStroke = "#2e4053"
+	colorFleetFill   = "#aeb6bf"
 
 	colorStarStroke = "#ac9d93"
 	colorStarFill   = "#e9c6af"
 
-	colorMilitaryStroke = "#2e86c1"
-	colorMilitaryFill   = "#aed6f1"
+	colorStarbaseStroke = "#2e86c1"
+	colorStarbaseFill   = "#aed6f1"
 
 	colorPlanetStroke = "#27ae60"
 	colorPlanetFill   = "#abebc6"
@@ -46,8 +46,8 @@ var (
 
 	baseStarbaseStyle = NewStyle(
 		StyleOption{"stroke-width", "0.33pt"},
-		StyleOption{"stroke", colorMilitaryStroke},
-		StyleOption{"fill", colorMilitaryFill},
+		StyleOption{"stroke", colorStarbaseStroke},
+		StyleOption{"fill", colorStarbaseFill},
 	)
 
 	starbaseStrokes = map[string]float64{
@@ -58,8 +58,8 @@ var (
 	}
 
 	fleetStyle = NewStyle(
-		StyleOption{"stroke", colorMilitaryStroke},
-		StyleOption{"fill", colorMilitaryFill},
+		StyleOption{"stroke", colorFleetStroke},
+		StyleOption{"fill", colorFleetFill},
 	)
 
 	fleetIdentStyle = NewStyle(
@@ -69,8 +69,8 @@ var (
 
 	outpostStyle = NewStyle(
 		StyleOption{"stroke-width", "0.2pt"},
-		StyleOption{"stroke", colorStationStroke},
-		StyleOption{"fill", colorStationFill},
+		StyleOption{"stroke", colorFleetStroke},
+		StyleOption{"fill", colorFleetFill},
 	)
 
 	basePlanetStyle = NewStyle(
@@ -112,8 +112,8 @@ var (
 		StyleOption{"font-family", "sans-serif"},
 		StyleOption{"font-size", "3.2pt"},
 		StyleOption{"stroke-width", "0.08pt"},
-		StyleOption{"stroke", colorMilitaryFill},
-		StyleOption{"fill", colorMilitaryStroke},
+		StyleOption{"stroke", colorFleetFill},
+		StyleOption{"fill", colorFleetStroke},
 	)
 )
 

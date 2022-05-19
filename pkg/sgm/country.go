@@ -277,14 +277,11 @@ type Fleet struct {
 
 	MilitaryPower float64 `sgm:"military_power"`
 
-	OwnerId CountryId `sgm:"-,id"`
+	OwnerId CountryId `sgm:"owner,id"`
 	Owner   *Country
-}
 
-type ShipId uint32
-type Ship struct {
-	FleetId FleetId `sgm:"fleet"`
-	Fleet   *Fleet
+	ShipIds []ShipId `sgm:"ships"`
+	Ships   []*Ship
 }
 
 func (f *Fleet) Name() string {
@@ -292,6 +289,15 @@ func (f *Fleet) Name() string {
 		return f.NameString
 	}
 	return f.NameStruct.Key
+}
+
+func (fleet *Fleet) IsTransport() bool {
+	for _, ship := range fleet.Ships {
+		if ship.ArmyId == DefaultArmyId {
+			return false
+		}
+	}
+	return true
 }
 
 func (fleet *Fleet) MilitaryPowerString() string {
@@ -305,3 +311,15 @@ func (fleet *Fleet) MilitaryPowerString() string {
 	}
 	return fmt.Sprintf("%.f", fleet.MilitaryPower)
 }
+
+type ShipId uint32
+type Ship struct {
+	FleetId FleetId `sgm:"fleet,id"`
+	Fleet   *Fleet
+
+	ArmyId ArmyId `sgm:"army,id"`
+}
+
+var DefaultArmyId = ArmyId(math.MaxUint32)
+
+type ArmyId uint32

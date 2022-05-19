@@ -38,7 +38,7 @@ const (
 	traceFlagCountrySegments
 	traceFlagShowGraphEdges
 
-	traceFlags = 0
+	traceFlags = traceFlagCountrySegments
 )
 
 //go:embed icons/*.svg

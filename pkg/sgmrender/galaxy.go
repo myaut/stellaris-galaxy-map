@@ -55,7 +55,7 @@ func (r *Renderer) renderStarbase(ctx *starRenderContext) {
 			style = style.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", starbaseStroke)})
 		}
 		r.createPath(ctx.g, style, starbasePath)
-		ctx.iconOffset = starbaseHalfSize + starbaseStroke
+		ctx.iconOffset = starbaseHalfSize + starbaseStroke/2
 
 		if starbase.Level == sgm.StarbaseCitadel {
 			r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
@@ -85,8 +85,8 @@ func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
 	// Fleets
 	fleets := ctx.star.MobileMilitaryFleets()
 	fleetPoint := sgmmath.Point{
-		X: -ctx.iconOffset / 2,
-		Y: ctx.iconOffset,
+		X: -ctx.iconOffset / 3,
+		Y: ctx.iconOffset + fleetHalfSize/3,
 	}
 	var extraFleets int
 	if len(fleets) > 4 {
@@ -160,7 +160,7 @@ func (r *Renderer) renderFleet(ctx *starRenderContext, point sgmmath.Point, flee
 	}
 	style := fleetStyle.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", fleetStrength)})
 
-	fleetPath := newFleetPath(fleetStrength / 2)
+	fleetPath := newFleetPath(fleetHalfSize+fleetStrength, fleetStrength/2)
 	fleetPath.Translate(point)
 	pathEl := r.createPath(ctx.g, style, fleetPath)
 	r.createTitle(pathEl, fmt.Sprintf("%s (%s)", fleet.Name(), fleet.MilitaryPowerString()))
@@ -212,9 +212,11 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 	switch {
 	case planet.EmployablePops > 50:
 		style = style.With(StyleOption{"stroke-width", "0.8pt"})
-		radius -= 0.15
+		radius -= 0.4
 	case planet.EmployablePops > 25:
 		style = style.With(StyleOption{"stroke-width", "0.6pt"})
+		radius -= 0.2
+	default:
 		radius -= 0.1
 	}
 

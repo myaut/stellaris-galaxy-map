@@ -38,11 +38,11 @@ func newStarbasePath(size float64) Path {
 		Complete()
 }
 
-func newFleetPath(off float64) Path {
-	return NewPath().MoveTo(0.0, -fleetHalfSize+off).
-		LineTo(-fleetHalfSize+off, -fleetHalfSize/3.0+off).
-		LineTo(-fleetHalfSize/2.0+off, fleetHalfSize-off).HorLine(fleetHalfSize/2.0-off).
-		LineTo(fleetHalfSize-off, -fleetHalfSize/3.0+off).Complete()
+func newFleetPath(size, off float64) Path {
+	return NewPath().MoveTo(0.0, -size+off).
+		LineTo(-size+off, -size/3.0+off).
+		LineTo(-size/2.0+off, size-off).HorLine(size/2.0-off).
+		LineTo(size-off, -size/3.0+off).Complete()
 }
 
 type PathElement struct {

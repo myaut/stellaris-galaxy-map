@@ -24,7 +24,6 @@ const (
 	countrySegHasCapital countrySegFlag = 1 << iota
 	countrySegHasOuterEdge
 	countrySegHasInnerEdge
-	countrySegIsEnclave
 )
 
 func (flags countrySegFlag) String() string {
@@ -36,14 +35,29 @@ func (flags countrySegFlag) String() string {
 		flagStr = append(flagStr, "EOUTER")
 	case flags&countrySegHasInnerEdge != 0:
 		flagStr = append(flagStr, "EINNER")
-	case flags&countrySegIsEnclave != 0:
-		flagStr = append(flagStr, "ENCLAVE")
 	}
 	return strings.Join(flagStr, "|")
 }
 
-type countrySegmentAdjancency struct {
-	isEnclave bool
+const (
+	borderEpsilon        = 1.0
+	borderAngleThreshold = 5 * math.Pi / 8
+)
+
+type countryBorderKey struct {
+	X, Y int
+}
+
+func borderEdgeKey(vertex voronoi.Vertex) countryBorderKey {
+	return countryBorderKey{
+		X: int(math.Floor(vertex.X / borderEpsilon)),
+		Y: int(math.Floor(vertex.Y / borderEpsilon)),
+	}
+}
+
+type countryBorder struct {
+	edges []*voronoi.Halfedge
+	rect  sgmmath.BoundingRect
 }
 
 type countrySegment struct {
@@ -54,9 +68,10 @@ type countrySegment struct {
 
 	stars map[sgm.StarId]struct{}
 
-	borders   []*voronoi.Halfedge
-	cells     []*voronoi.Cell
-	neighbors map[*countrySegment]countrySegmentAdjancency
+	borderMap map[countryBorderKey]*countryBorder
+	borders   []*countryBorder
+
+	cells []*voronoi.Cell
 }
 
 type countryRenderer struct {
@@ -127,99 +142,20 @@ func (cr *countryRenderer) initSegments() {
 				starId: struct{}{},
 			},
 			cells:     []*voronoi.Cell{cell},
-			neighbors: make(map[*countrySegment]countrySegmentAdjancency),
+			borderMap: make(map[countryBorderKey]*countryBorder),
 		}
 		cr.buildSegment(seg, starId, star, cell, nil)
+
 		cr.segments = append(cr.segments, seg)
-	}
-
-	// After we identified all borders, find neighbors and enclaves
-	for _, seg := range cr.segments {
-		for _, border := range seg.borders {
-			_, neighSeg := cr.getBorderNeighbor(border)
-			if neighSeg == nil {
-				continue
-			}
-
-			if _, knownNeighbor := seg.neighbors[neighSeg]; !knownNeighbor {
-				var adjNode countrySegmentAdjancency
-				if cr.isEnclave(seg, neighSeg) {
-					seg.flags |= countrySegIsEnclave
-					adjNode.isEnclave = true
-				}
-
-				seg.neighbors[neighSeg] = adjNode
-			}
-		}
 	}
 
 	if traceFlags&traceFlagCountrySegments != 0 {
 		for _, seg := range cr.segments {
-			log.Printf("InitSeg: %p (%s) - stars: %d, neigh: %d, flags: %s, bounds: %v\n",
+			log.Printf("InitSeg: %p (%s) - stars: %d, borders: %d, flags: %s, bounds: %v\n",
 				seg, sgm.CountryName(seg.countryId, cr.r.state.Countries[seg.countryId]),
-				len(seg.stars), len(seg.neighbors), seg.flags.String(), seg.bounds)
+				len(seg.stars), len(seg.borders), seg.flags.String(), seg.bounds)
 		}
 	}
-}
-
-func (cr *countryRenderer) isEnclave(seg, outerSeg *countrySegment) bool {
-	if seg.flags&(countrySegHasOuterEdge|countrySegHasInnerEdge) != 0 {
-		return false
-	}
-	if !outerSeg.bounds.Contains(seg.bounds) {
-		return false
-	}
-
-	// Check simplest enclave case - empire on all sides of the our segment
-	var hasAnotherEmpire bool
-	for _, border := range seg.borders {
-		otherCell := border.Edge.GetOtherCell(border.Cell)
-		if cr.cellMap[otherCell] != outerSeg {
-			hasAnotherEmpire = true
-			break
-		}
-	}
-	if !hasAnotherEmpire {
-		return true
-	}
-
-	// Segments might be large, making false positives when checking simple
-	// rectangles, so we use adjacent stars this time
-	// Note that we don't use direct adjacencies (like voronoi graph provides)
-	// due to scenario of multiple conjoined enclaves
-	const sectorCount = 6
-	sectorAdjancency := make([]float64, sectorCount)
-	center := seg.bounds.Center()
-	checkedAdjStar := make(map[sgm.StarId]struct{})
-	for _, cell := range seg.cells {
-		starId := cr.starMap[cell.Site]
-		for _, adjNode := range cr.r.starGeoIndex[starId] {
-			if _, checked := checkedAdjStar[adjNode.AdjStarId]; checked {
-				continue
-			}
-			checkedAdjStar[adjNode.AdjStarId] = struct{}{}
-
-			pv := sgmmath.NewVector(center, adjNode.AdjStar.Point()).ToPolar()
-			weight := 1.0
-			if _, inOuterSeg := outerSeg.stars[adjNode.AdjStarId]; !inOuterSeg {
-				weight = -weight
-			}
-
-			sectorAdjancency[pv.Sector(sectorCount)] += weight
-		}
-	}
-
-	if traceFlags&traceFlagCountrySegments != 0 {
-		log.Printf("IsEnclave: %p -> %p, adj: %v\n", outerSeg, seg, sectorAdjancency)
-	}
-
-	// Check that at list for one of six directions we do not have enough adjacent nodes
-	for _, adjNodeWeight := range sectorAdjancency {
-		if adjNodeWeight < 0 {
-			return false
-		}
-	}
-	return true
 }
 
 func (cr *countryRenderer) buildSegment(
@@ -230,6 +166,11 @@ func (cr *countryRenderer) buildSegment(
 		return
 	}
 	cr.cellMap[cell] = seg
+
+	seg.bounds.Add(star.Point())
+	if star.HasCapital() {
+		seg.flags |= countrySegHasCapital
+	}
 
 	// Continue walking halfedges from the side opposite to the last walked cell
 	halfedges := cell.Halfedges
@@ -245,43 +186,55 @@ func (cr *countryRenderer) buildSegment(
 
 	for _, he := range halfedges {
 		neighCell := he.Edge.GetOtherCell(cell)
-		if neighCell == nil {
-			seg.flags |= countrySegHasOuterEdge
-			seg.borders = append(seg.borders, he)
-			continue
-		}
+		if neighCell != nil {
+			neighStarId, neighStar := cr.starByCell(neighCell)
 
-		neighStarId, neighStar := cr.starByCell(neighCell)
-		if neighStar.Owner() == seg.countryId && star.IsDistant() == neighStar.IsDistant() {
-			// Recursively walk edges counter-clockwise
-			seg.cells = append(seg.cells, neighCell)
-			seg.stars[neighStarId] = struct{}{}
+			if neighStar.Owner() == seg.countryId && star.IsDistant() == neighStar.IsDistant() {
+				// Recursively walk edges counter-clockwise
+				seg.cells = append(seg.cells, neighCell)
+				seg.stars[neighStarId] = struct{}{}
 
-			cr.buildSegment(seg, neighStarId, neighStar, neighCell, cell)
-		} else {
+				cr.buildSegment(seg, neighStarId, neighStar, neighCell, cell)
+				continue
+			}
+
 			if math.Signbit(he.Cell.Site.X) != math.Signbit(neighCell.Site.X) &&
 				math.Signbit(he.Cell.Site.Y) != math.Signbit(neighCell.Site.Y) {
 				seg.flags |= countrySegHasInnerEdge
 			}
-
-			seg.borders = append(seg.borders, he)
 		}
 
-		if neighStar.HasCapital() {
-			seg.flags |= countrySegHasCapital
+		startVertex, endVertex := he.Edge.Va.Vertex, he.Edge.Vb.Vertex
+		if he.Edge.RightCell == cell {
+			startVertex, endVertex = endVertex, startVertex
+		}
+		startKey, endKey := borderEdgeKey(startVertex), borderEdgeKey(endVertex)
+
+		if startBorder, knownStart := seg.borderMap[startKey]; knownStart {
+			seg.borderMap[endKey] = startBorder
+			startBorder.edges = append(startBorder.edges, he)
+			startBorder.rect.Add(sgmmath.Point(endVertex))
+		} else if endBorder, knownEnd := seg.borderMap[endKey]; knownEnd {
+			seg.borderMap[startKey] = endBorder
+			endBorder.edges = append(endBorder.edges, he)
+			endBorder.rect.Add(sgmmath.Point(startVertex))
+		} else {
+			if traceFlags&traceFlagCountrySegments != 0 {
+				fmt.Printf("NewBorder: %p -> [%v, %v], %v\n", seg,
+					startKey, endKey, seg.borderMap)
+			}
+
+			border := &countryBorder{
+				edges: []*voronoi.Halfedge{he},
+				rect:  sgmmath.NewPointBoundingRect(sgmmath.Point(startVertex)),
+			}
+			border.rect.Add(sgmmath.Point(endVertex))
+
+			seg.borderMap[startKey] = border
+			seg.borderMap[endKey] = border
+			seg.borders = append(seg.borders, border)
 		}
 	}
-
-	seg.bounds.Add(star.Point())
-}
-
-func (cr *countryRenderer) hasForeignNeighbors(seg *countrySegment, starId sgm.StarId) bool {
-	for _, adjNode := range cr.r.starGeoIndex[starId] {
-		if !adjNode.AdjStar.IsOwnedBy(seg.countryId) {
-			return true
-		}
-	}
-	return false
 }
 
 func (cr *countryRenderer) buildPoint(
@@ -296,55 +249,60 @@ func (cr *countryRenderer) buildPoint(
 	return pv.PointAtLength(pv.Length - insetSign*countryBorderGap)
 }
 
+func (cr *countryRenderer) buildEdge(he *voronoi.Halfedge, insetSign float64) (sgmmath.Point, sgmmath.Point) {
+	cellPoint := sgmmath.Point(he.Cell.Site)
+	startPoint := cr.buildPoint(cellPoint, he.Edge.Va, insetSign)
+	endPoint := cr.buildPoint(cellPoint, he.Edge.Vb, insetSign)
+	if he.Edge.RightCell == he.Cell {
+		return endPoint, startPoint
+	}
+	return startPoint, endPoint
+}
+
 func (cr *countryRenderer) buildPath(
-	cutSegs map[*countrySegment]struct{}, seg, outerSeg, prevSeg *countrySegment,
-	path Path, insetSign float64, start bool,
+	border *countryBorder, path Path, insetSign float64, start bool,
 ) Path {
-	if cutSegs != nil {
-		// Already touched seg in recurse call below
-		if _, alreadyCut := cutSegs[seg]; alreadyCut {
-			return path
-		}
-		cutSegs[seg] = struct{}{}
-	}
-
-	borders := seg.borders
-	if prevSeg != nil {
-		for i, border := range borders {
-			_, neighSeg := cr.getBorderNeighbor(border)
-			if neighSeg == prevSeg {
-				borders = append(borders[i:], borders[:i]...)
-				break
-			}
-		}
-	}
-
-	for i, border := range borders {
-		_, neighSeg := cr.getBorderNeighbor(border)
-		if neighSeg != nil && neighSeg.flags&countrySegIsEnclave != 0 {
-			if outerSeg != nil && neighSeg != outerSeg && neighSeg.neighbors[outerSeg].isEnclave {
-				// Complex case of multiple-neighbor enclaves: recurse
-				path = cr.buildPath(cutSegs, neighSeg, outerSeg, seg, path, insetSign, false)
-			}
-
-			// Do not render borders with enclave during first pass
-			continue
-		}
-
-		cellPoint := sgmmath.Point(border.Cell.Site)
-		startPoint := cr.buildPoint(cellPoint, border.Edge.Va, insetSign)
-		endPoint := cr.buildPoint(cellPoint, border.Edge.Vb, insetSign)
-		if border.Edge.RightCell == border.Cell {
-			startPoint, endPoint = endPoint, startPoint
-		}
+	for i, he := range border.edges {
+		startPoint, endPoint := cr.buildEdge(he, insetSign)
 
 		if start && i == 0 {
+			prevIndex := i - 1
+			if prevIndex < 0 {
+				prevIndex = len(border.edges) - 1
+			}
+			prevPoint, _ := cr.buildEdge(border.edges[prevIndex], insetSign)
+
+			prevVector := sgmmath.NewVector(startPoint, prevPoint).ToPolar()
+			nextVector := sgmmath.NewVector(startPoint, endPoint).ToPolar()
+			if prevVector.AngleDiff(nextVector) < borderAngleThreshold {
+				startPoint = nextVector.PointAtOffset(0.4)
+			}
+
 			path = path.MoveToPoint(startPoint)
 		}
-		path = path.LineToPoint(endPoint)
+
+		nextIndex := i + 1
+		if nextIndex == len(border.edges) {
+			nextIndex = 0
+		}
+		_, nextPoint := cr.buildEdge(border.edges[nextIndex], insetSign)
+
+		points := []sgmmath.Point{endPoint}
+		prevVector := sgmmath.NewVector(endPoint, startPoint).ToPolar()
+		nextVector := sgmmath.NewVector(endPoint, nextPoint).ToPolar()
+		if prevVector.AngleDiff(nextVector) < borderAngleThreshold {
+			points = []sgmmath.Point{
+				prevVector.PointAtOffset(0.4),
+				nextVector.PointAtOffset(0.4),
+			}
+		}
+
+		for _, point := range points {
+			path = path.LineToPoint(point)
+		}
 	}
 
-	return path
+	return path.Complete()
 }
 
 func getCountryMapColor(key string, defaultColor string) string {
@@ -371,13 +329,9 @@ func (r *Renderer) renderCountries() []countryRenderContext {
 			StyleOption{"fill", getCountryMapColor(country.Flag.Colors[0], DefaultCountryFillColor)},
 		)
 
-		path := cr.buildPath(nil, seg, nil, nil, NewPath(), 1.0, true).Complete()
-		cutEnclaves := make(map[*countrySegment]struct{})
-		for neighSeg := range seg.neighbors {
-			if neighSeg.flags&countrySegIsEnclave != 0 && neighSeg.neighbors[seg].isEnclave {
-				path = cr.buildPath(cutEnclaves, neighSeg, seg, nil,
-					path, -1.0, true).Complete()
-			}
+		path := NewPath()
+		for _, border := range seg.borders {
+			path = cr.buildPath(border, path, 1.0, true)
 		}
 		r.createPath(r.canvas, style, path)
 
@@ -499,9 +453,11 @@ starLoop:
 		}
 
 		for _, border := range seg.borders {
-			if rect.Includes(sgmmath.Point(border.Edge.Va.Vertex)) ||
-				rect.Includes(sgmmath.Point(border.Edge.Vb.Vertex)) {
-				continue starLoop
+			for _, he := range border.edges {
+				if rect.Includes(sgmmath.Point(he.Edge.Va.Vertex)) ||
+					rect.Includes(sgmmath.Point(he.Edge.Vb.Vertex)) {
+					continue starLoop
+				}
 			}
 		}
 		for _, adjNode := range r.starGeoIndex[starId] {

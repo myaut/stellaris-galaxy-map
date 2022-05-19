@@ -70,6 +70,14 @@ func (pv PolarVector) ToVector() Vector {
 	}
 }
 
+func (pv PolarVector) AngleDiff(pv2 PolarVector) float64 {
+	diff := math.Abs(pv.Angle - pv2.Angle)
+	if diff > math.Pi {
+		diff = 2*math.Pi - diff
+	}
+	return diff
+}
+
 func (pv PolarVector) Sector(sectorCount int) int {
 	sector := math.Floor(float64(sectorCount/2) * pv.Angle / math.Pi)
 	return (sectorCount/2 + int(sector)) % sectorCount
