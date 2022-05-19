@@ -118,6 +118,9 @@ func (p *Parser) prepareFields(v reflect.Value) map[string]reflect.Value {
 				tag = tag[:len(tag)-3]
 				field.SetUint(math.MaxUint32)
 			}
+			if tag == "-" {
+				continue
+			}
 
 			fields[tag] = field
 		}

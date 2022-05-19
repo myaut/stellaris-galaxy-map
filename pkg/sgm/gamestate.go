@@ -29,6 +29,7 @@ type GameState struct {
 	StarbaseMgr    StarbaseMgr                        `sgm:"starbase_mgr"`
 	Megastructures map[MegastructureId]*Megastructure `sgm:"megastructures"`
 	Fleets         map[FleetId]*Fleet                 `sgm:"fleet"`
+	Ships          map[ShipId]*Ship                   `sgm:"ships"`
 }
 
 func LoadGameState(path string) (*GameState, error) {
@@ -52,67 +53,100 @@ func LoadGameState(path string) (*GameState, error) {
 
 	// Build references between objects in the universe
 	for starId, star := range state.Stars {
-		if star.SectorId != DefaultSectorId {
-			star.Sector = state.Sectors[star.SectorId]
-			if star.Sector == nil {
-				log.Printf("error: sector #%d is not found", star.SectorId)
-			}
+		state.linkStarRefs(starId, star)
+	}
+	for countryId, country := range state.Countries {
+		if country == nil {
+			continue
 		}
 
-		if len(star.StarbaseIds) == 0 {
-			star.StarbaseIds = []StarbaseId{star.StarbaseId}
-		}
-		for _, starbaseId := range star.StarbaseIds {
-			if starbaseId == DefaultStarbaseId {
-				continue
-			}
-			starbase := state.StarbaseMgr.Starbases[starbaseId]
-			if starbase != nil {
-				star.Starbases = append(star.Starbases, starbase)
-				starbase.Star = star
+		for _, ownedFleet := range country.FleetMgr.OwnedFleets {
+			if fleet := state.Fleets[ownedFleet.FleetId]; fleet != nil {
+				ownedFleet.Fleet = fleet
+				fleet.OwnerId = countryId
+				fleet.Owner = country
 			} else {
-				log.Printf("error: starbase #%d is not found", starbaseId)
+				log.Printf("error: fleet #%d is not found", ownedFleet.FleetId)
 			}
 		}
-
-		for _, planetId := range star.PlanetIds {
-			if planet := state.Planets.Planets[planetId]; planet != nil {
-				star.Planets = append(star.Planets, planet)
-				planet.Star = star
-			} else {
-				log.Printf("error: planet #%d is not found", planetId)
-			}
+	}
+	for starbaseId, starbase := range state.StarbaseMgr.Starbases {
+		if starbase != nil {
+			starbase.Station = state.Ships[starbase.StationId]
+		} else {
+			log.Printf("warn: starbase #%d is nil", starbaseId)
 		}
-
-		for _, megastructureId := range star.MegastructureIds {
-			if megastructure := state.Megastructures[megastructureId]; megastructure != nil {
-				star.Megastructures = append(star.Megastructures, megastructure)
-				megastructure.Star = star
-				if megastructure.PlanetId != DefaultPlanetId {
-					megastructure.Planet = state.Planets.Planets[megastructure.PlanetId]
-				}
-			} else {
-				log.Printf("error: megastructure #%d is not found", megastructureId)
-			}
-		}
-
-		for _, fleetId := range star.FleetIds {
-			if fleet := state.Fleets[fleetId]; fleet != nil {
-				star.Fleets = append(star.Fleets, fleet)
-			} else {
-				log.Printf("error: fleet #%d is not found", fleetId)
-			}
-		}
-
-		for i, hyperlane := range star.Hyperlanes {
-			if toStar := state.Stars[hyperlane.ToId]; toStar != nil {
-				star.Hyperlanes[i].To = toStar
-			} else {
-				log.Printf("error: star #%d is not found in hyperlane from star #%d",
-					hyperlane.ToId, starId)
-			}
+	}
+	for shipId, ship := range state.Ships {
+		if ship != nil {
+			ship.Fleet = state.Fleets[ship.FleetId]
+		} else {
+			log.Printf("warn: ship #%d is nil", shipId)
 		}
 	}
 
 	return state, nil
+}
+
+func (state *GameState) linkStarRefs(starId StarId, star *Star) {
+	if star.SectorId != DefaultSectorId {
+		star.Sector = state.Sectors[star.SectorId]
+		if star.Sector == nil {
+			log.Printf("error: sector #%d is not found", star.SectorId)
+		}
+	}
+
+	if len(star.StarbaseIds) == 0 {
+		star.StarbaseIds = []StarbaseId{star.StarbaseId}
+	}
+	for _, starbaseId := range star.StarbaseIds {
+		if starbaseId == DefaultStarbaseId {
+			continue
+		}
+		starbase := state.StarbaseMgr.Starbases[starbaseId]
+		if starbase != nil {
+			star.Starbases = append(star.Starbases, starbase)
+			starbase.Star = star
+		} else {
+			log.Printf("error: starbase #%d is not found", starbaseId)
+		}
+	}
+
+	for _, planetId := range star.PlanetIds {
+		if planet := state.Planets.Planets[planetId]; planet != nil {
+			star.Planets = append(star.Planets, planet)
+			planet.Star = star
+		} else {
+			log.Printf("error: planet #%d is not found", planetId)
+		}
+	}
+
+	for _, megastructureId := range star.MegastructureIds {
+		if megastructure := state.Megastructures[megastructureId]; megastructure != nil {
+			star.Megastructures = append(star.Megastructures, megastructure)
+			megastructure.Star = star
+			if megastructure.PlanetId != DefaultPlanetId {
+				megastructure.Planet = state.Planets.Planets[megastructure.PlanetId]
+			}
+		} else {
+			log.Printf("error: megastructure #%d is not found", megastructureId)
+		}
+	}
+
+	for _, fleetId := range star.FleetIds {
+		if fleet := state.Fleets[fleetId]; fleet != nil {
+			star.Fleets = append(star.Fleets, fleet)
+		} else {
+			log.Printf("error: fleet #%d is not found", fleetId)
+		}
+	}
+
+	for i, hyperlane := range star.Hyperlanes {
+		if toStar := state.Stars[hyperlane.ToId]; toStar != nil {
+			star.Hyperlanes[i].To = toStar
+		} else {
+			log.Printf("error: star #%d is not found in hyperlane from star #%d",
+				hyperlane.ToId, starId)
+		}
+	}
 }

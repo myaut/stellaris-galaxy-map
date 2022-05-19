@@ -62,6 +62,11 @@ var (
 		StyleOption{"fill", colorMilitaryFill},
 	)
 
+	fleetIdentStyle = NewStyle(
+		StyleOption{"stroke-width", "0.2pt"},
+		StyleOption{"fill-opacity", "0.8"},
+	)
+
 	outpostStyle = NewStyle(
 		StyleOption{"stroke-width", "0.2pt"},
 		StyleOption{"stroke", colorStationStroke},
@@ -99,7 +104,7 @@ var (
 	baseCountryStyle = NewStyle(
 		StyleOption{"stroke-width", "2pt"},
 		StyleOption{"stroke-linejoin", "miter"},
-		StyleOption{"fill-opacity", ".4"},
+		StyleOption{"fill-opacity", "0.6"},
 		StyleOption{"fill-rule", "evenodd"},
 	)
 

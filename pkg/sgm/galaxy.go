@@ -58,7 +58,7 @@ type Star struct {
 
 func (s *Star) Name() string {
 	if s.NameString == "" {
-		s.NameString = s.NameStruct.Resolve()
+		s.NameString = strings.ReplaceAll(s.NameStruct.Resolve(), "_", " ")
 	}
 	return s.NameString
 }
@@ -75,14 +75,23 @@ func (s *Star) PrimaryStarbase() *Starbase {
 }
 
 func (s *Star) Owner() CountryId {
-	if s.Sector == nil {
-		starbase := s.PrimaryStarbase()
-		if starbase != nil {
+	if s.Sector != nil {
+		return s.Sector.Owner
+	}
+
+	starbase := s.PrimaryStarbase()
+	if starbase != nil {
+		// 3.3
+		if starbase.Owner != DefaultCountryId {
 			return starbase.Owner
 		}
-		return DefaultCountryId
+
+		// 3.4
+		if starbase.Station != nil && starbase.Station.Fleet != nil {
+			return starbase.Station.Fleet.OwnerId
+		}
 	}
-	return s.Sector.Owner
+	return DefaultCountryId
 }
 
 func (s *Star) IsOwnedBy(countryId CountryId) bool {

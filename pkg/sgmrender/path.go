@@ -17,15 +17,19 @@ const (
 )
 
 var (
-	defaultStarPath = NewPath().
-			MoveTo(-starHalfSize, 0.0).LineTo(0.0, starHalfSize).
-			LineTo(starHalfSize, 0.0).LineTo(0.0, -starHalfSize).
-			Complete()
+	defaultStarPath = newDiamondPath(starHalfSize)
 
 	outpostPath      = newStarbasePath(outpostHalfSize)
 	starbasePath     = newStarbasePath(starbaseHalfSize)
 	citadelInnerPath = newStarbasePath(2 * starbaseHalfSize / 3)
 )
+
+func newDiamondPath(size float64) Path {
+	return NewPath().
+		MoveTo(-size, 0.0).LineTo(0.0, size).
+		LineTo(size, 0.0).LineTo(0.0, -size).
+		Complete()
+}
 
 func newStarbasePath(size float64) Path {
 	return NewPath().
@@ -85,6 +89,13 @@ func (p Path) VertLine(y float64) Path {
 
 func (p Path) Complete() Path {
 	return Path{path: append(p.path, PathElement{Command: 'Z'})}
+}
+
+func (p *Path) Translate(point sgmmath.Point) {
+	for i := range p.path {
+		p.path[i].X += point.X
+		p.path[i].Y += point.Y
+	}
 }
 
 func (p *Path) String() string {

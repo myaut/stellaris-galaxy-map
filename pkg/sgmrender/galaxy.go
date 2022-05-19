@@ -160,10 +160,25 @@ func (r *Renderer) renderFleet(ctx *starRenderContext, point sgmmath.Point, flee
 	}
 	style := fleetStyle.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", fleetStrength)})
 
-	g := ctx.g.CreateElement("g")
-	g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", point.X, point.Y))
-	pathEl := r.createPath(g, style, newFleetPath(fleetStrength/2))
+	fleetPath := newFleetPath(fleetStrength / 2)
+	fleetPath.Translate(point)
+	pathEl := r.createPath(ctx.g, style, fleetPath)
 	r.createTitle(pathEl, fmt.Sprintf("%s (%s)", fleet.Name(), fleet.MilitaryPowerString()))
+
+	if fleet.Owner != nil {
+		bgColor := sgm.ColorMap.Colors[fleet.Owner.Flag.Colors[0]]
+		fgColor := sgm.ColorMap.Colors[fleet.Owner.Flag.Colors[1]]
+		if bgColor != nil && fgColor != nil {
+			fleetIdentStyle := fleetIdentStyle.With(
+				StyleOption{"stroke", fgColor.Ship.Color().ToHexCode().String()},
+				StyleOption{"fill", bgColor.Ship.Color().ToHexCode().String()},
+			)
+
+			fleetIdentPath := newDiamondPath(fleetHalfSize / 2)
+			fleetIdentPath.Translate(point)
+			r.createPath(ctx.g, fleetIdentStyle, fleetIdentPath)
+		}
+	}
 }
 
 func (r *Renderer) renderMegastructure(

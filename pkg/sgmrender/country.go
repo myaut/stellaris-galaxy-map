@@ -15,6 +15,11 @@ import (
 
 type countrySegFlag uint
 
+var (
+	DefaultCountryBorderColor = "#202020"
+	DefaultCountryFillColor   = "#c0c0c0"
+)
+
 const (
 	countrySegHasCapital countrySegFlag = 1 << iota
 	countrySegHasOuterEdge
@@ -342,6 +347,14 @@ func (cr *countryRenderer) buildPath(
 	return path
 }
 
+func getCountryMapColor(key string, defaultColor string) string {
+	color := sgm.ColorMap.Colors[key]
+	if color == nil {
+		return defaultColor
+	}
+	return color.Map.Color().ToHexCode().String()
+}
+
 func (r *Renderer) renderCountries() []countryRenderContext {
 	cr := r.createCountryRenderer()
 
@@ -353,11 +366,9 @@ func (r *Renderer) renderCountries() []countryRenderContext {
 		country := r.state.Countries[seg.countryId]
 
 		// TODO: handle "use_as_border_color", cases when colors are not found
-		borderColor := sgm.ColorMap.Colors[country.Flag.Colors[1]]
-		countryColor := sgm.ColorMap.Colors[country.Flag.Colors[0]]
 		style := baseCountryStyle.With(
-			StyleOption{"stroke", borderColor.Map.Color().ToHexCode().String()},
-			StyleOption{"fill", countryColor.Map.Color().ToHexCode().String()},
+			StyleOption{"stroke", getCountryMapColor(country.Flag.Colors[1], DefaultCountryBorderColor)},
+			StyleOption{"fill", getCountryMapColor(country.Flag.Colors[0], DefaultCountryFillColor)},
 		)
 
 		path := cr.buildPath(nil, seg, nil, nil, NewPath(), 1.0, true).Complete()

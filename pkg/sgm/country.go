@@ -105,6 +105,12 @@ var MegastructureStages = map[string]int{
 	"final":    20,
 }
 
+type StationId uint32
+type Station struct {
+	FleetId FleetId `sgm:"fleet"`
+	Fleet   *Fleet
+}
+
 var DefaultStarbaseId = StarbaseId(math.MaxUint32)
 
 type StarbaseId uint32
@@ -113,6 +119,9 @@ type Starbase struct {
 	Modules   map[int]string `sgm:"modules"`
 	Buildings map[int]string `sgm:"buildings"`
 	Owner     CountryId      `sgm:"owner,id"`
+
+	StationId ShipId `sgm:"station,id"`
+	Station   *Ship
 
 	Star *Star
 }
@@ -172,6 +181,11 @@ func (sb *Starbase) Role() StarbaseRole {
 	return maxRole
 }
 
+type OwnedFleet struct {
+	FleetId FleetId `sgm:"fleet"`
+	Fleet   *Fleet
+}
+
 var DefaultCountryId = CountryId(math.MaxUint32)
 
 type CountryId uint32
@@ -180,6 +194,10 @@ type Country struct {
 	NameStruct Name   `sgm:"name,struct"`
 
 	Flag CountryFlag `sgm:"flag"`
+
+	FleetMgr struct {
+		OwnedFleets []OwnedFleet `sgm:"owned_fleets"`
+	} `sgm:"fleets_manager"`
 }
 
 func (c *Country) Name() string {
@@ -258,6 +276,15 @@ type Fleet struct {
 	Civilian bool `sgm:"civilian"`
 
 	MilitaryPower float64 `sgm:"military_power"`
+
+	OwnerId CountryId `sgm:"-,id"`
+	Owner   *Country
+}
+
+type ShipId uint32
+type Ship struct {
+	FleetId FleetId `sgm:"fleet"`
+	Fleet   *Fleet
 }
 
 func (f *Fleet) Name() string {
