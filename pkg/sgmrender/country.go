@@ -74,14 +74,13 @@ type countrySegment struct {
 	cells []*voronoi.Cell
 }
 
+type countryGetter func(s *sgm.Star) sgm.CountryId
+
 type countryRenderer struct {
 	r *Renderer
 
 	diagram *voronoi.Diagram
-
-	starMap  map[voronoi.Vertex]sgm.StarId
-	cellMap  map[*voronoi.Cell]*countrySegment
-	segments []*countrySegment
+	starMap map[voronoi.Vertex]sgm.StarId
 }
 
 type countryRenderContext struct {
@@ -95,7 +94,6 @@ func (r *Renderer) createCountryRenderer() *countryRenderer {
 		r: r,
 
 		starMap: make(map[voronoi.Vertex]sgm.StarId),
-		cellMap: make(map[*voronoi.Cell]*countrySegment),
 	}
 
 	sites := make([]voronoi.Vertex, 0, len(r.state.Stars))
@@ -113,7 +111,6 @@ func (r *Renderer) createCountryRenderer() *countryRenderer {
 		r.bounds.Max.Y+canvasPadding/2)
 	cr.diagram = voronoi.ComputeDiagram(sites, bbox, true)
 
-	cr.initSegments()
 	return cr
 }
 
@@ -122,21 +119,24 @@ func (cr *countryRenderer) starByCell(cell *voronoi.Cell) (sgm.StarId, *sgm.Star
 	return starId, cr.r.state.Stars[starId]
 }
 
-func (cr *countryRenderer) getBorderNeighbor(border *voronoi.Halfedge) (*voronoi.Cell, *countrySegment) {
-	neighCell := border.Edge.GetOtherCell(border.Cell)
-	return neighCell, cr.cellMap[neighCell]
-}
+func (cr *countryRenderer) buildSegments(getter countryGetter) []*countrySegment {
+	segments := make([]*countrySegment, 0, 16)
+	cellMap := make(map[*voronoi.Cell]*countrySegment)
 
-func (cr *countryRenderer) initSegments() {
 	// Walk all cells and build country segments
 	for _, cell := range cr.diagram.Cells {
-		if _, walkedCell := cr.cellMap[cell]; walkedCell {
+		if _, walkedCell := cellMap[cell]; walkedCell {
 			continue
 		}
 
 		starId, star := cr.starByCell(cell)
+		countryId := getter(star)
+		if countryId == sgm.DefaultCountryId {
+			continue
+		}
+
 		seg := &countrySegment{
-			countryId: star.Owner(),
+			countryId: countryId,
 			bounds:    sgmmath.NewBoundingRect(),
 			stars: map[sgm.StarId]struct{}{
 				starId: struct{}{},
@@ -144,28 +144,31 @@ func (cr *countryRenderer) initSegments() {
 			cells:     []*voronoi.Cell{cell},
 			borderMap: make(map[countryBorderKey]*countryBorder),
 		}
-		cr.buildSegment(seg, starId, star, cell, nil)
 
-		cr.segments = append(cr.segments, seg)
+		cr.buildSegment(cellMap, getter, seg, starId, star, cell, nil)
+		segments = append(segments, seg)
 	}
 
 	if traceFlags&traceFlagCountrySegments != 0 {
-		for _, seg := range cr.segments {
+		for _, seg := range segments {
 			log.Printf("InitSeg: %p (%s) - stars: %d, borders: %d, flags: %s, bounds: %v\n",
 				seg, sgm.CountryName(seg.countryId, cr.r.state.Countries[seg.countryId]),
 				len(seg.stars), len(seg.borders), seg.flags.String(), seg.bounds)
 		}
 	}
+
+	return segments
 }
 
 func (cr *countryRenderer) buildSegment(
+	cellMap map[*voronoi.Cell]*countrySegment, getter countryGetter,
 	seg *countrySegment, starId sgm.StarId, star *sgm.Star,
 	cell, prevCell *voronoi.Cell,
 ) {
-	if _, walkedCell := cr.cellMap[cell]; walkedCell {
+	if _, walkedCell := cellMap[cell]; walkedCell {
 		return
 	}
-	cr.cellMap[cell] = seg
+	cellMap[cell] = seg
 
 	seg.bounds.Add(star.Point())
 	if star.HasCapital() {
@@ -189,12 +192,12 @@ func (cr *countryRenderer) buildSegment(
 		if neighCell != nil {
 			neighStarId, neighStar := cr.starByCell(neighCell)
 
-			if neighStar.Owner() == seg.countryId && star.IsDistant() == neighStar.IsDistant() {
+			if getter(neighStar) == seg.countryId && star.IsDistant() == neighStar.IsDistant() {
 				// Recursively walk edges counter-clockwise
 				seg.cells = append(seg.cells, neighCell)
 				seg.stars[neighStarId] = struct{}{}
 
-				cr.buildSegment(seg, neighStarId, neighStar, neighCell, cell)
+				cr.buildSegment(cellMap, getter, seg, neighStarId, neighStar, neighCell, cell)
 				continue
 			}
 
@@ -259,13 +262,11 @@ func (cr *countryRenderer) buildEdge(he *voronoi.Halfedge, insetSign float64) (s
 	return startPoint, endPoint
 }
 
-func (cr *countryRenderer) buildPath(
-	border *countryBorder, path Path, insetSign float64, start bool,
-) Path {
+func (cr *countryRenderer) buildBorderPath(border *countryBorder, path Path, insetSign float64) Path {
 	for i, he := range border.edges {
 		startPoint, endPoint := cr.buildEdge(he, insetSign)
 
-		if start && i == 0 {
+		if i == 0 {
 			prevIndex := i - 1
 			if prevIndex < 0 {
 				prevIndex = len(border.edges) - 1
@@ -305,7 +306,16 @@ func (cr *countryRenderer) buildPath(
 	return path.Complete()
 }
 
+func (cr *countryRenderer) buildPath(seg *countrySegment) Path {
+	path := NewPath()
+	for _, border := range seg.borders {
+		path = cr.buildBorderPath(border, path, 1.0)
+	}
+	return path
+}
+
 func getCountryMapColor(key string, defaultColor string) string {
+	// TODO: handle "use_as_border_color", cases when colors are not found
 	color := sgm.ColorMap.Colors[key]
 	if color == nil {
 		return defaultColor
@@ -315,31 +325,41 @@ func getCountryMapColor(key string, defaultColor string) string {
 
 func (r *Renderer) renderCountries() []countryRenderContext {
 	cr := r.createCountryRenderer()
-
-	countries := make([]countryRenderContext, 0, len(cr.segments))
-	for _, seg := range cr.segments {
-		if seg.countryId == sgm.DefaultCountryId {
-			continue
-		}
+	segments := cr.buildSegments(func(s *sgm.Star) sgm.CountryId {
+		return s.Owner()
+	})
+	countries := make([]countryRenderContext, 0, len(segments))
+	for _, seg := range segments {
 		country := r.state.Countries[seg.countryId]
-
-		// TODO: handle "use_as_border_color", cases when colors are not found
 		style := baseCountryStyle.With(
 			StyleOption{"stroke", getCountryMapColor(country.Flag.Colors[1], DefaultCountryBorderColor)},
 			StyleOption{"fill", getCountryMapColor(country.Flag.Colors[0], DefaultCountryFillColor)},
 		)
 
-		path := NewPath()
-		for _, border := range seg.borders {
-			path = cr.buildPath(border, path, 1.0, true)
-		}
-		r.createPath(r.canvas, style, path)
+		r.createPath(r.canvas, style, cr.buildPath(seg))
 
 		countries = append(countries, countryRenderContext{
 			country: country,
 			seg:     seg,
 			style:   style,
 		})
+	}
+
+	occupiedSegs := cr.buildSegments(func(s *sgm.Star) sgm.CountryId {
+		return s.Occupier()
+	})
+	occupierPatters := make(map[sgm.CountryId]struct{})
+	for _, seg := range occupiedSegs {
+		patternId := fmt.Sprintf("occupied-by-%d", seg.countryId)
+		if _, hasPattern := occupierPatters[seg.countryId]; !hasPattern {
+			r.createCountryPattern(seg.countryId, patternId)
+			occupierPatters[seg.countryId] = struct{}{}
+		}
+
+		style := NewStyle(
+			StyleOption{"fill", fmt.Sprintf("url(#%s)", patternId)},
+		)
+		r.createPath(r.canvas, style, cr.buildPath(seg))
 	}
 
 	if traceFlags&traceFlagShowGraphEdges != 0 {
@@ -350,6 +370,26 @@ func (r *Renderer) renderCountries() []countryRenderContext {
 	}
 
 	return countries
+}
+
+func (r *Renderer) createCountryPattern(countryId sgm.CountryId, id string) {
+	pattern := r.defs.CreateElement("pattern")
+	pattern.CreateAttr("id", id)
+	pattern.CreateAttr("x", "0")
+	pattern.CreateAttr("y", "0")
+	pattern.CreateAttr("width", fmt.Sprint(countryPatternSize))
+	pattern.CreateAttr("height", fmt.Sprint(countryPatternSize))
+	pattern.CreateAttr("patternUnits", "userSpaceOnUse")
+
+	g := pattern.CreateElement("g")
+	country := r.state.Countries[countryId]
+	style := occupationPatternStyle.With(
+		StyleOption{"stroke", getCountryMapColor(country.Flag.Colors[0], DefaultCountryFillColor)},
+	)
+	for x := 0.0; x < countryPatternSize; x += countryPatternStep {
+		r.createPath(g, style,
+			NewPath().MoveTo(x+countryPatternStep, 0.0).LineTo(x, countryPatternSize))
+	}
 }
 
 func (r *Renderer) renderCountryNames(countries []countryRenderContext) {

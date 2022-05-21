@@ -56,6 +56,12 @@ const (
 	MegastructureSizeRingWorld = 3
 	MegastructureSizeStar      = 2
 	MegastructureSizePlanet    = 1
+
+	FleetOwnershipNormal      = "normal"
+	FleetOwnershipLostControl = "lost_control"
+
+	BattleTypeShips  = "ships"
+	BattleTypeArmies = "armies"
 )
 
 var MegastructureSize = map[string]int{
@@ -70,6 +76,18 @@ var MegastructureSize = map[string]int{
 	MegastructureInterstellarAssembly: MegastructureSizePlanet,
 	MegastructureShipyard:             MegastructureSizePlanet,
 	MegastructureStrategicCenter:      MegastructureSizePlanet,
+}
+
+var MegastructureStages = map[string]int{
+	"ruined":   -1,
+	"0":        0,
+	"1":        1,
+	"2":        2,
+	"3":        3,
+	"4":        4,
+	"5":        5,
+	"restored": 10,
+	"final":    20,
 }
 
 type StarbaseRole int
@@ -93,17 +111,15 @@ func (role StarbaseRole) String() string {
 	}[role]
 }
 
-var MegastructureStages = map[string]int{
-	"ruined":   -1,
-	"0":        0,
-	"1":        1,
-	"2":        2,
-	"3":        3,
-	"4":        4,
-	"5":        5,
-	"restored": 10,
-	"final":    20,
-}
+type WarRole int
+
+const (
+	WarRoleStarNeutral WarRole = iota
+	WarRoleStarDefender
+	WarRoleStarAttacker
+
+	WarRoleMax
+)
 
 type StationId uint32
 type Station struct {
@@ -184,6 +200,10 @@ func (sb *Starbase) Role() StarbaseRole {
 type OwnedFleet struct {
 	FleetId FleetId `sgm:"fleet"`
 	Fleet   *Fleet
+
+	OwnershipStatus string `sgm:"ownership_status"`
+
+	DebtorId CountryId `sgm:"debtor,id"`
 }
 
 var DefaultCountryId = CountryId(math.MaxUint32)
@@ -195,9 +215,18 @@ type Country struct {
 
 	Flag CountryFlag `sgm:"flag"`
 
+	CapitalId PlanetId `sgm:"capital"`
+	Capital   *Planet
+
 	FleetMgr struct {
 		OwnedFleets []OwnedFleet `sgm:"owned_fleets"`
 	} `sgm:"fleets_manager"`
+
+	Wars []WarRef
+}
+
+type CountryFlag struct {
+	Colors []string `sgm:"colors"`
 }
 
 func (c *Country) Name() string {
@@ -205,6 +234,16 @@ func (c *Country) Name() string {
 		c.NameString = c.NameStruct.Format(CountryNameFormats)
 	}
 	return c.NameString
+}
+
+func CountryName(countryId CountryId, country *Country) string {
+	if country != nil {
+		return country.Name()
+	}
+	if countryId == DefaultCountryId {
+		return "_default"
+	}
+	return fmt.Sprint(countryId)
 }
 
 var DefaultSectorId = SectorId(math.MaxUint32)
@@ -250,20 +289,6 @@ func (m Megastructure) TypeStage() (string, int) {
 	return m.Type, 0
 }
 
-type CountryFlag struct {
-	Colors []string `sgm:"colors"`
-}
-
-func CountryName(countryId CountryId, country *Country) string {
-	if country != nil {
-		return country.Name()
-	}
-	if countryId == DefaultCountryId {
-		return "_default"
-	}
-	return fmt.Sprint(countryId)
-}
-
 type FleetId uint32
 type Fleet struct {
 	NameString string `sgm:"name"`
@@ -277,8 +302,10 @@ type Fleet struct {
 
 	MilitaryPower float64 `sgm:"military_power"`
 
-	OwnerId CountryId `sgm:"owner,id"`
-	Owner   *Country
+	OwnerId         CountryId `sgm:"owner,id"`
+	Owner           *Country
+	OwnershipStatus string
+	DebtorId        CountryId `sgm:"-,id"`
 
 	ShipIds []ShipId `sgm:"ships"`
 	Ships   []*Ship
@@ -312,6 +339,38 @@ func (fleet *Fleet) MilitaryPowerString() string {
 	return fmt.Sprintf("%.f", fleet.MilitaryPower)
 }
 
+func (fleet *Fleet) Role(s *Star) WarRole {
+	if len(fleet.Owner.Wars) == 0 {
+		return WarRoleStarNeutral
+	}
+
+	countryId := s.Owner()
+	if fleet.OwnerId == countryId {
+		return WarRoleStarDefender
+	}
+
+	for _, warRef := range fleet.Owner.Wars {
+		allyList, enemyList := warRef.War.Defenders, warRef.War.Attackers
+		if warRef.IsAttacker {
+			allyList, enemyList = enemyList, allyList
+		}
+
+		for _, country := range enemyList {
+			if country.CountryId == countryId {
+				return WarRoleStarAttacker
+			}
+		}
+		for _, country := range allyList {
+			if country.CountryId == countryId {
+				return WarRoleStarDefender
+			}
+		}
+	}
+
+	// These fleets are merely passing by
+	return WarRoleStarNeutral
+}
+
 type ShipId uint32
 type Ship struct {
 	FleetId FleetId `sgm:"fleet,id"`
@@ -323,3 +382,42 @@ type Ship struct {
 var DefaultArmyId = ArmyId(math.MaxUint32)
 
 type ArmyId uint32
+
+type WarId uint32
+type War struct {
+	StartDate Date `sgm:"start_date"`
+
+	Defenders []WarCountry `sgm:"defenders"`
+	Attackers []WarCountry `sgm:"attackers"`
+
+	Battles []Battle `sgm:"battles"`
+}
+
+type WarCountry struct {
+	CountryId CountryId `sgm:"country,id"`
+}
+
+type Battle struct {
+	DefenderIds []CountryId `sgm:"defenders"`
+	AttackerIds []CountryId `sgm:"attackers"`
+
+	AttackerVictory bool   `sgm:"attacker_victory"`
+	Date            Date   `sgm:"date"`
+	Type            string `sgm:"type"`
+
+	StarId StarId `sgm:"system,id"`
+
+	AttackerLosses int `sgm:"attacker_losses"`
+	DefenderLosses int `sgm:"defender_losses"`
+}
+
+type WarRef struct {
+	WarId      WarId
+	War        *War
+	IsAttacker bool
+}
+
+type BattleRef struct {
+	WarId       WarId
+	BattleIndex int
+}

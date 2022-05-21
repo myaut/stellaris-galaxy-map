@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 4.2333333 4.2333333"
+   height="16"
+   width="16">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path2108-9-1-8-25"
+     d="m 3.9032652,3.6587341 -2.1e-6,0.3100163 H 3.5932446 L 2.8181974,3.1937043 2.5081748,3.5037206 H 2.1981563 V 3.1937043 L 2.3531676,3.0386908 0.52916641,1.3229163 0.33804028,0.4035255 1.3229163,0.79374967 2.9732077,2.4186581 3.1282159,2.2636447 H 3.4382344 V 2.573661 L 3.1282169,2.8836879 Z"
+     style="vector-effect:none;fill:#e6e6e6;fill-opacity:1;stroke:#666666;stroke-width:0.176389;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+  <path
+     style="opacity:1;vector-effect:none;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.17638889;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="m 2.38125,2.9104166 0,-1.0583333"
+     id="path879" />
+  <path
+     id="path2108-9-4-6"
+     d="m 0.25159997,3.6747073 2.11e-6,0.3100195 0.31001846,2.1e-6 0.77504716,-0.7750493 0.3100227,0.3100185 0.3100185,-2.1e-6 V 3.2096775 L 1.8016975,3.0546704 3.4395828,1.3229163 3.8168249,0.41950295 2.9104162,0.79374967 1.1816575,2.4346293 1.0266493,2.279619 H 0.71663082 V 2.5896385 L 1.0266482,2.8996591 Z"
+     style="vector-effect:none;fill:#afe9c6;fill-opacity:1;stroke:#217844;stroke-width:0.176389;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+</svg>

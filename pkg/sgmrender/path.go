@@ -8,12 +8,15 @@ import (
 )
 
 const (
-	fleetHalfSize = 2.0
-	fleetStep     = 3.2
+	fleetHalfSize = 1.8
+	fleetStep     = 3.0
 
 	starHalfSize     = 2.0
 	outpostHalfSize  = 3.0
-	starbaseHalfSize = 4.2
+	starbaseHalfSize = 4.0
+
+	countryPatternSize = 8.0
+	countryPatternStep = 2.0
 )
 
 var (

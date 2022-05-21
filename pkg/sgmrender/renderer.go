@@ -19,14 +19,14 @@ const (
 	canvasWidth   = 2160
 	canvasHeight  = 2160
 
-	fontSize = 3.2
+	fontSize = 2.4
 
 	maxCellSize      = 48.0
 	countryBorderGap = 1.2
 
-	iconSizeSm  = 4.8
+	iconSizeSm  = 4.0
 	iconStepSm  = 3.6
-	iconSizeMd  = 6
+	iconSizeMd  = 5.6
 	iconStepMd  = 4.8
 	svgIconSize = 16
 
@@ -38,7 +38,7 @@ const (
 	traceFlagCountrySegments
 	traceFlagShowGraphEdges
 
-	traceFlags = traceFlagCountrySegments
+	traceFlags = 0
 )
 
 //go:embed icons/*.svg
@@ -48,6 +48,7 @@ type Renderer struct {
 	state  *sgm.GameState
 	doc    *etree.Document
 	canvas *etree.Element
+	defs   *etree.Element
 
 	bounds       sgmmath.BoundingRect
 	innerBounds  sgmmath.BoundingRect
@@ -74,6 +75,8 @@ func NewRenderer(state *sgm.GameState) *Renderer {
 			r.bounds.Max.X-r.bounds.Min.X+2*canvasPadding,
 			r.bounds.Max.Y-r.bounds.Min.Y+2*canvasPadding))
 	r.canvas.CreateAttr("xmlns", "http://www.w3.org/2000/svg")
+
+	r.defs = r.canvas.CreateElement("defs")
 
 	r.iconCache = make(map[string]*etree.Document)
 
@@ -134,7 +137,8 @@ func (r *Renderer) Render() {
 	titlePoint.Y += countryFontSize
 	r.createText(r.canvas, countryLegendStyle, titlePoint, r.state.Name)
 	titlePoint.Y += 0.6 * countryFontSize
-	r.createText(r.canvas, countryLegendStyle, titlePoint, r.state.Date)
+	r.createText(r.canvas, countryLegendStyle, titlePoint,
+		fmt.Sprintf("Year %d", r.state.Date.Year()))
 
 	footerStyle := starTextStyle.With(StyleOption{"text-anchor", "end"})
 	footerPoint := r.bounds.Max.Add(sgmmath.Point{0.0, -2 * fontSize})

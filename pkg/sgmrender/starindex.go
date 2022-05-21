@@ -109,18 +109,15 @@ func (r *Renderer) pickTextQuadrant(starId sgm.StarId) int {
 	quadrantWeight := make([]float64, 4)
 	for _, adjNode := range r.starGeoIndex[starId] {
 		quadrant := adjNode.Vector.Sector(4)
-		weight := 0.1
+		weight := 0.5
 
 		// Nodes with pops/starbases produce large icon sets with texts
 		// that we're trying to avoid
-		if adjNode.AdjStar.HasPops() {
-			weight += 1.0
-		}
-		if adjNode.AdjStar.HasSignificantMegastructures() {
+		if adjNode.AdjStar.HasPops() || adjNode.AdjStar.HasSignificantMegastructures() {
 			weight += 1.0
 		}
 		if adjNode.AdjStar.HasUpgradedStarbase() {
-			weight += 2.0
+			weight += 1.0
 		}
 
 		points := weight / (adjNode.Vector.Length * adjNode.Vector.Length)

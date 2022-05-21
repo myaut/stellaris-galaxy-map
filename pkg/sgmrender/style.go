@@ -22,6 +22,12 @@ const (
 	colorStarbaseStroke = "#2e86c1"
 	colorStarbaseFill   = "#aed6f1"
 
+	colorHostileStroke = "#a93226"
+	colorHostileFill   = "#f2d7d5"
+
+	colorFriendlyStroke = "#217844"
+	colorFriendlyFill   = "#afe9c6"
+
 	colorPlanetStroke = "#27ae60"
 	colorPlanetFill   = "#abebc6"
 )
@@ -44,10 +50,26 @@ var (
 		StyleOption{"fill", colorStarFill},
 	)
 
+	outpostStyle = NewStyle(
+		StyleOption{"stroke-width", "0.2pt"},
+		StyleOption{"stroke", colorFleetStroke},
+		StyleOption{"fill", colorFleetFill},
+	)
+
+	outpostLostStyle = outpostStyle.With(
+		StyleOption{"stroke", colorHostileStroke},
+		StyleOption{"fill", colorHostileFill},
+	)
+
 	baseStarbaseStyle = NewStyle(
 		StyleOption{"stroke-width", "0.33pt"},
 		StyleOption{"stroke", colorStarbaseStroke},
 		StyleOption{"fill", colorStarbaseFill},
+	)
+
+	starbaseLostStyle = baseStarbaseStyle.With(
+		StyleOption{"stroke", colorHostileStroke},
+		StyleOption{"fill", colorHostileFill},
 	)
 
 	starbaseStrokes = map[string]float64{
@@ -57,20 +79,24 @@ var (
 		sgm.StarbaseCitadel:  1.0,
 	}
 
-	fleetStyle = NewStyle(
-		StyleOption{"stroke", colorFleetStroke},
-		StyleOption{"fill", colorFleetFill},
-	)
+	fleetStyles = map[sgm.WarRole]Style{
+		sgm.WarRoleStarNeutral: NewStyle(
+			StyleOption{"stroke", colorFleetStroke},
+			StyleOption{"fill", colorFleetFill},
+		),
+		sgm.WarRoleStarAttacker: NewStyle(
+			StyleOption{"stroke", colorHostileStroke},
+			StyleOption{"fill", colorHostileFill},
+		),
+		sgm.WarRoleStarDefender: NewStyle(
+			StyleOption{"stroke", colorFriendlyStroke},
+			StyleOption{"fill", colorFriendlyFill},
+		),
+	}
 
 	fleetIdentStyle = NewStyle(
 		StyleOption{"stroke-width", "0.2pt"},
 		StyleOption{"fill-opacity", "0.8"},
-	)
-
-	outpostStyle = NewStyle(
-		StyleOption{"stroke-width", "0.2pt"},
-		StyleOption{"stroke", colorFleetStroke},
-		StyleOption{"fill", colorFleetFill},
 	)
 
 	basePlanetStyle = NewStyle(
@@ -106,6 +132,11 @@ var (
 		StyleOption{"stroke-linejoin", "miter"},
 		StyleOption{"fill-opacity", "0.6"},
 		StyleOption{"fill-rule", "evenodd"},
+	)
+
+	occupationPatternStyle = NewStyle(
+		StyleOption{"stroke-width", "0.5pt"},
+		StyleOption{"stroke-opacity", "0.6"},
 	)
 
 	fleetTextStyle = NewStyle(

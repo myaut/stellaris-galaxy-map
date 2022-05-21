@@ -26,7 +26,7 @@ const (
 
 var DefaultStarId = StarId(math.MaxUint32)
 
-type StarId int
+type StarId uint32
 type Star struct {
 	Type        string `sgm:"type"`
 	NameString  string `sgm:"name"`
@@ -54,6 +54,9 @@ type Star struct {
 
 	FleetIds []FleetId `sgm:"fleet_presence"`
 	Fleets   []*Fleet
+	mmFleets []*Fleet
+
+	Battles []BattleRef
 }
 
 func (s *Star) Name() string {
@@ -89,6 +92,16 @@ func (s *Star) Owner() CountryId {
 		// 3.4
 		if starbase.Station != nil && starbase.Station.Fleet != nil {
 			return starbase.Station.Fleet.OwnerId
+		}
+	}
+	return DefaultCountryId
+}
+
+func (s *Star) Occupier() CountryId {
+	starbase := s.PrimaryStarbase()
+	if starbase != nil && starbase.Station != nil && starbase.Station.Fleet != nil {
+		if starbase.Station.Fleet.OwnershipStatus == FleetOwnershipLostControl {
+			return starbase.Station.Fleet.DebtorId
 		}
 	}
 	return DefaultCountryId
@@ -177,7 +190,8 @@ func (s *Star) IsSignificant() bool {
 	return s.HasPops() ||
 		s.HasUpgradedStarbase() ||
 		s.HasSignificantMegastructures() ||
-		len(s.Bypasses()) > 0
+		len(s.Bypasses()) > 0 ||
+		len(s.MobileMilitaryFleets()) > 0
 }
 
 func (s *Star) HasUpgradedStarbase() bool {
@@ -206,17 +220,19 @@ func (s *Star) IsDistant() bool {
 }
 
 func (s *Star) MobileMilitaryFleets() []*Fleet {
-	var fleets []*Fleet
-	for _, fleet := range s.Fleets {
-		if !fleet.Civilian && fleet.Mobile && !fleet.IsTransport() {
-			fleets = append(fleets, fleet)
-		}
+	if s.mmFleets != nil {
+		return s.mmFleets
 	}
 
-	sort.Slice(fleets, func(i, j int) bool {
-		return fleets[i].MilitaryPower > fleets[j].MilitaryPower
+	for _, fleet := range s.Fleets {
+		if !fleet.Civilian && fleet.Mobile && !fleet.IsTransport() {
+			s.mmFleets = append(s.mmFleets, fleet)
+		}
+	}
+	sort.Slice(s.mmFleets, func(i, j int) bool {
+		return s.mmFleets[i].MilitaryPower > s.mmFleets[j].MilitaryPower
 	})
-	return fleets
+	return s.mmFleets
 }
 
 type Coordinate struct {

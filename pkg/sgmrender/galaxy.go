@@ -16,11 +16,10 @@ type starRenderContext struct {
 	starId sgm.StarId
 	star   *sgm.Star
 
-	g            *etree.Element
-	iconOffset   float64
-	colonyOffset float64
-	fleetOffset  float64
-	quadrant     int
+	g                               *etree.Element
+	iconOffset                      float64
+	nameOffsetTop, nameOffsetBottom float64
+	quadrant                        int
 }
 
 func (r *Renderer) renderStars() (stars []*starRenderContext) {
@@ -45,11 +44,22 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 
 func (r *Renderer) renderStarbase(ctx *starRenderContext) {
 	starbase := ctx.star.PrimaryStarbase()
+	lostControl := ctx.star.Occupier() != sgm.DefaultCountryId
 	if starbase.Level == sgm.StarbaseOutpost {
-		r.createPath(ctx.g, outpostStyle, outpostPath)
+		style := outpostStyle
+		if lostControl {
+			style = outpostLostStyle
+		}
+
+		r.createPath(ctx.g, style, outpostPath)
 		ctx.iconOffset = outpostHalfSize
 	} else {
-		style := baseStarbaseStyle
+		baseStyle := baseStarbaseStyle
+		if lostControl {
+			baseStyle = starbaseLostStyle
+		}
+
+		style := baseStyle
 		starbaseStroke := starbaseStrokes[starbase.Level]
 		if starbaseStroke > 0.0 {
 			style = style.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", starbaseStroke)})
@@ -58,78 +68,47 @@ func (r *Renderer) renderStarbase(ctx *starRenderContext) {
 		ctx.iconOffset = starbaseHalfSize + starbaseStroke/2
 
 		if starbase.Level == sgm.StarbaseCitadel {
-			r.createPath(ctx.g, baseStarbaseStyle, citadelInnerPath)
+			r.createPath(ctx.g, baseStyle, citadelInnerPath)
 		}
 
-		role := starbase.Role()
-		if role != sgm.StarbaseRoleMax {
-			rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
-			r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
+		if !lostControl {
+			role := starbase.Role()
+			if role != sgm.StarbaseRoleMax {
+				rolePoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: -ctx.iconOffset / 3}
+				r.createIcon(ctx.g, rolePoint, "starbase-"+role.String(), iconSizeSm)
+			}
 		}
 	}
-	ctx.colonyOffset = ctx.iconOffset / 2
 }
 
 func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
-	// Bypasses
-	bypasses := ctx.star.Bypasses()
-	transportPoint := sgmmath.Point{
-		X: -ctx.iconOffset - float64(len(bypasses))*iconStepSm,
-		Y: -iconSizeSm / 2,
-	}
-	for _, bypass := range bypasses {
-		r.createIcon(ctx.g, transportPoint, "bypass-"+bypass, iconSizeSm)
-		transportPoint.X += iconStepSm
-	}
-
 	// Fleets
-	fleets := ctx.star.MobileMilitaryFleets()
-	fleetPoint := sgmmath.Point{
-		X: -ctx.iconOffset / 3,
-		Y: ctx.iconOffset + fleetHalfSize/3,
-	}
-	var extraFleets int
-	if len(fleets) > 4 {
-		extraFleets = len(fleets) - 4
-		fleets = fleets[:4]
-	}
-	for _, fleet := range fleets {
-		r.renderFleet(ctx, fleetPoint, fleet)
-		fleetPoint.X += fleetStep
-	}
-	if extraFleets > 0 {
-		r.createText(ctx.g, fleetTextStyle,
-			fleetPoint.Add(sgmmath.Point{-fleetStep, fleetHalfSize}),
-			fmt.Sprintf("+%d", extraFleets))
-	}
-	if len(fleets) > 0 {
-		ctx.fleetOffset = fleetStep
-	}
+	r.renderAllFleets(ctx)
 
 	// Other features
-	colonies := ctx.star.Colonies(false)
-	habitats := ctx.star.Colonies(true)
 	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureSizeStar)
 	ringWorlds := ctx.star.MegastructuresBySize(sgm.MegastructureSizeRingWorld)
+	if len(ringWorlds) > 0 {
+		megastructures = append(megastructures, ringWorlds[0])
+	}
+
+	colonies := ctx.star.Colonies(false)
 	sort.Slice(colonies, func(i, j int) bool {
 		return colonies[i].EmployablePops > colonies[j].EmployablePops
 	})
 
-	planetPoint := sgmmath.Point{X: ctx.colonyOffset, Y: -ctx.iconOffset}
+	planetPoint := sgmmath.Point{X: -2 * ctx.iconOffset / 3, Y: -ctx.iconOffset}
 	for _, ms := range megastructures {
+		planetPoint.X -= iconStepMd
 		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeStar, ms, iconSizeMd)
-		planetPoint.X += iconStepMd
-	}
-	if len(ringWorlds) > 0 {
-		r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizeRingWorld, ringWorlds[0], iconSizeMd)
-		planetPoint.X += iconStepMd
 	}
 	for _, planet := range colonies {
+		planetPoint.X -= iconStepMd
 		r.renderPlanet(ctx, planetPoint, planet)
-		planetPoint.X += iconStepMd
 	}
-	ctx.colonyOffset = planetPoint.X
 
+	stationPoint := sgmmath.Point{X: 2 * ctx.iconOffset / 3, Y: -ctx.iconOffset}
+	habitats := ctx.star.Colonies(true)
 	planetStations := append(
 		ctx.star.MegastructuresBySize(sgm.MegastructureSizePlanet),
 		make([]*sgm.Megastructure, len(habitats))...)
@@ -139,26 +118,96 @@ func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
 	}
 	for i, ms := range planetStations {
 		if ms != nil {
-			r.renderMegastructure(ctx, planetPoint, sgm.MegastructureSizePlanet, ms, iconSizeSm)
+			r.renderMegastructure(ctx, stationPoint, sgm.MegastructureSizePlanet, ms, iconSizeSm)
 		} else {
-			r.createIcon(ctx.g, planetPoint, "habitat", iconSizeSm)
+			r.createIcon(ctx.g, stationPoint, "habitat", iconSizeSm)
 		}
 
 		if (i+1)%planetStationsStep == 0 {
-			planetPoint.X = ctx.colonyOffset
-			planetPoint.Y += iconStepSm
+			stationPoint.X = 2 * ctx.iconOffset / 3
+			stationPoint.Y += iconStepSm
 		} else {
-			planetPoint.X += iconStepSm
+			stationPoint.X += iconStepSm
 		}
+	}
+
+	// Bypasses
+	bypasses := ctx.star.Bypasses()
+	transportPoint := sgmmath.Point{X: -ctx.iconOffset / 2, Y: ctx.iconOffset - iconStepMd}
+	if ctx.iconOffset == outpostHalfSize && (len(colonies)+len(megastructures)) > 0 {
+		transportPoint.Y += iconStepMd / 2
+		ctx.nameOffsetBottom += iconStepMd / 2
+	}
+	for _, bypass := range bypasses {
+		transportPoint.X -= iconStepSm
+		r.createIcon(ctx.g, transportPoint, "bypass-"+bypass, iconSizeSm)
 	}
 }
 
-func (r *Renderer) renderFleet(ctx *starRenderContext, point sgmmath.Point, fleet *sgm.Fleet) {
-	fleetStrength := math.Floor(math.Log10(fleet.MilitaryPower)) / 10.0
-	if fleetStrength <= 0.33 {
-		fleetStrength = 0.33
+func (r *Renderer) renderAllFleets(ctx *starRenderContext) {
+	allFleets := ctx.star.MobileMilitaryFleets()
+	fleetGroups := make([][]*sgm.Fleet, sgm.WarRoleMax)
+	for _, fleet := range allFleets {
+		role := fleet.Role(ctx.star)
+		fleetGroups[role] = append(fleetGroups[role], fleet)
 	}
-	style := fleetStyle.With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", fleetStrength)})
+
+	for role, fleets := range fleetGroups {
+		r.renderFleets(ctx, sgm.WarRole(role), fleets)
+	}
+
+}
+
+func (r *Renderer) renderFleets(ctx *starRenderContext, role sgm.WarRole, fleets []*sgm.Fleet) {
+	if len(fleets) == 0 {
+		return
+	}
+
+	fleetPoint := sgmmath.Point{
+		Y: -ctx.iconOffset - fleetHalfSize,
+	}
+	step := fleetStep
+
+	switch role {
+	case sgm.WarRoleStarNeutral:
+		ctx.nameOffsetBottom += fleetStep
+		fleetPoint = sgmmath.Point{
+			X: -ctx.iconOffset / 3,
+			Y: ctx.iconOffset + fleetHalfSize/3,
+		}
+	case sgm.WarRoleStarDefender:
+		ctx.nameOffsetTop += fleetHalfSize + fleetStep
+		step = -step
+		fleetPoint.X = -fleetHalfSize / 2
+	case sgm.WarRoleStarAttacker:
+		ctx.nameOffsetTop += fleetHalfSize + fleetStep
+		fleetPoint.X = fleetHalfSize / 2
+	}
+
+	var extraFleets int
+	if len(fleets) > 4 {
+		extraFleets = len(fleets) - 4
+		fleets = fleets[:4]
+	}
+	for _, fleet := range fleets {
+		r.renderFleet(ctx, fleetPoint, role, fleet)
+		fleetPoint.X += step
+	}
+	if extraFleets > 0 {
+		r.createText(ctx.g, fleetTextStyle,
+			fleetPoint.Add(sgmmath.Point{-fleetStep, fleetHalfSize}),
+			fmt.Sprintf("+%d", extraFleets))
+	}
+}
+
+func (r *Renderer) renderFleet(
+	ctx *starRenderContext, point sgmmath.Point, role sgm.WarRole, fleet *sgm.Fleet,
+) {
+	fleetStrength := math.Floor(math.Log10(fleet.MilitaryPower)) / 8.0
+	if fleetStrength <= 0.2 {
+		fleetStrength = 0.2
+	}
+	style := fleetStyles[role].With(StyleOption{"stroke-width", fmt.Sprintf("%fpt", fleetStrength)})
 
 	fleetPath := newFleetPath(fleetHalfSize+fleetStrength, fleetStrength/2)
 	fleetPath.Translate(point)
@@ -174,7 +223,7 @@ func (r *Renderer) renderFleet(ctx *starRenderContext, point sgmmath.Point, flee
 				StyleOption{"fill", bgColor.Ship.Color().ToHexCode().String()},
 			)
 
-			fleetIdentPath := newDiamondPath(fleetHalfSize / 2)
+			fleetIdentPath := newDiamondPath(2 * fleetHalfSize / 3)
 			fleetIdentPath.Translate(point)
 			r.createPath(ctx.g, fleetIdentStyle, fleetIdentPath)
 		}
@@ -244,15 +293,15 @@ func (r *Renderer) renderStarName(ctx *starRenderContext) {
 	switch ctx.quadrant {
 	case 0, -1:
 		textAnchor = "start"
-		point.X -= ctx.iconOffset
+		point.X -= 2 * ctx.iconOffset / 3
 	case 1, -2:
 		textAnchor = "end"
-		point.X += ctx.colonyOffset
+		point.X += 2 * ctx.iconOffset / 3
 	}
 	if ctx.quadrant >= 0 {
-		point.Y -= ctx.iconOffset/2 + 2*fontSize/3
+		point.Y -= ctx.iconOffset/2 + 2*fontSize/3 + ctx.nameOffsetTop
 	} else {
-		point.Y += ctx.iconOffset + fontSize + ctx.fleetOffset
+		point.Y += ctx.iconOffset + fontSize + ctx.nameOffsetBottom
 	}
 
 	textEl := r.createText(r.canvas, starTextStyle, point, name)
