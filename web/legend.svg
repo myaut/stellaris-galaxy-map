@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    viewBox="0 0 86.614635 76.990787"
    version="1.1"
    id="svg12707"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="legend.svg">
   <defs
      id="defs12701" />
@@ -25,21 +23,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="420.41304"
-     inkscape:cy="283.01117"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="315.54923"
+     inkscape:cy="204.15762"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1097"
+     inkscape:window-height="1003"
      inkscape:window-x="0"
-     inkscape:window-y="30"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      units="px"
      width="720px"
      showguides="true"
-     inkscape:guide-bbox="true">
+     inkscape:guide-bbox="true"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid13290" />
@@ -124,7 +123,7 @@
        id="guide1262"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="-1.202981,12.02981"
+       position="20.450678,10.826829"
        orientation="0,1"
        id="guide1318"
        inkscape:locked="false" />
@@ -133,6 +132,18 @@
        orientation="1,0"
        id="guide1524"
        inkscape:locked="false" />
+    <sodipodi:guide
+       position="20.450678,14.435773"
+       orientation="0,-1"
+       id="guide1028" />
+    <sodipodi:guide
+       position="24.059621,7.2178863"
+       orientation="0,-1"
+       id="guide1030" />
+    <sodipodi:guide
+       position="31.277507,3.6089431"
+       orientation="0,-1"
+       id="guide1032" />
   </sodipodi:namedview>
   <metadata
      id="metadata12704">
@@ -154,56 +165,36 @@
     <text
        x="2.6725168"
        y="132.65344"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880">
-      <tspan
-         style="font-size:4.23333311px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307">Starbases</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307">Starbases</tspan></text>
     <text
        x="7.8291302"
        y="141.47545"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5">Starpost</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5">Starpost</tspan></text>
     <text
        x="7.7144728"
        y="137.89726"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5">Outpost</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5">Outpost</tspan></text>
     <text
        x="7.7853751"
        y="152.25708"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-2">Citadel</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-2">Citadel</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path10267"
        d="m 4.3737252,144.33749 0.54706,0.91177 h 1.09412 l 0.54706,-0.91177 -0.54706,-0.91177 h -1.09412 z"
        style="fill:#aed6f1;stroke:#2e86c1;stroke-width:0.19537861pt" />
-    <g
-       id="g10289"
-       transform="matrix(0.52100962,0,0,0.52100962,5.0588526,191.08455)">
-      <path
-         inkscape:connector-curvature="0"
-         id="path10287"
-         d="m 0,-1.835 -1.835,1.333333 1,2.336667 h 1.67 l 1,-2.336667 z"
-         style="fill:#aed6f1;stroke:#2e86c1;stroke-width:0.33000002pt">
-        <title
-           id="title10285">Tiyanki Space Whale (1136)</title>
-      </path>
-    </g>
     <path
        id="path6392"
        d="m 4.3851622,147.92737 0.5470601,0.91177 H 6.0263425 L 6.5734026,147.92737 6.0263425,147.0156 H 4.9322223 Z"
@@ -236,21 +227,17 @@
     <text
        x="7.8265238"
        y="145.07658"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-36">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-7">Starhold</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-36"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-7">Starhold</tspan></text>
     <text
        x="7.7217212"
        y="148.65038"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-36-5">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-7-3">Fortress</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-36-5"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-7-3">Fortress</tspan></text>
     <g
        id="g6982"
        transform="matrix(0.15630288,0,0,0.15630288,24.960278,135.62141)">
@@ -339,48 +326,38 @@
     <text
        x="28.268873"
        y="137.71283"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6">Bastion</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6">Bastion</tspan></text>
     <text
        x="28.299253"
        y="141.36475"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-2">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-9">Shipyard</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-2"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-9">Shipyard</tspan></text>
     <text
        x="28.379969"
        y="145.05072"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-2-1">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-9-2">Anchorage</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-2-1"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-9-2">Anchorage</tspan></text>
     <text
        x="28.339949"
        y="148.64487"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-2-1-7">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-9-2-0">Trade Hub</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-2-1-7"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-9-2-0">Trade Hub</tspan></text>
     <text
        x="3.5532227"
        y="159.46832"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-9">
-      <tspan
-         style="font-size:4.23333311px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-3">Megastructures</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-9"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-3">Megastructures</tspan></text>
     <g
        id="g10745"
        transform="matrix(0.1953786,0,0,0.1953786,3.6857168,172.62914)">
@@ -539,83 +516,67 @@
     <text
        x="8.1619053"
        y="164.65102"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0">Habitat</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0">Habitat</tspan></text>
     <text
        x="8.1189442"
        y="168.30292"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-2">Megastructure</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-2">Megastructure</tspan></text>
     <text
        x="8.1293688"
        y="171.88148"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-6-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-2-1">Matter Decompressor</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-6-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-2-1">Matter Decompressor</tspan></text>
     <text
        x="8.213706"
        y="175.59471"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-6-8">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-2-7">Dyson Sphere</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-6-8"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-2-7">Dyson Sphere</tspan></text>
     <text
        x="8.127779"
        y="179.28958"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-6-8-9">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-2-7-2">Ring World</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-6-8-9"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-2-7-2">Ring World</tspan></text>
     <text
        x="8.1922245"
        y="182.87704"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-6-8-0">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-2-7-23">Megastructure (ruined)</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-6-8-0"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-2-7-23">Megastructure (ruined)</tspan></text>
     <text
-       x="8.0167542"
-       y="192.24809"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-9">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-22">Fleet</tspan>
-    </text>
+       x="8.0908995"
+       y="193.72458"
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-9"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-22">Neutral</tspan></text>
     <text
        x="48.196644"
        y="132.76871"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-8">
-      <tspan
-         style="font-size:4.23333311px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-9">Planets</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-8"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-9">Planets</tspan></text>
     <g
        id="g1398"
-       transform="translate(-1.5681717,3.7163522)">
+       transform="matrix(1.5,0,0,1.5,-27.677209,-68.567989)">
       <circle
          cx="51.653973"
          cy="143.97328"
          r="0.74243873"
-         style="fill:#abebc6;stroke:#27ae60;stroke-width:0.20840386pt"
+         style="fill:#abebc6;stroke:#27ae60;stroke-width:0.208404pt"
          id="circle5479">
         <title
            id="title5477">Neutralis I (109 pops)</title>
@@ -624,7 +585,7 @@
          cx="51.653973"
          cy="143.97328"
          r="0.37121937"
-         style="fill:#abebc6;stroke:#27ae60;stroke-width:0.10420193pt"
+         style="fill:#abebc6;stroke:#27ae60;stroke-width:0.104202pt"
          id="circle5483">
         <title
            id="title5481">Neutralis I (109 pops)</title>
@@ -632,67 +593,60 @@
     </g>
     <circle
        id="circle5942"
-       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.20840386pt"
-       r="0.74243873"
-       cy="144.14668"
-       cx="50.156467">
+       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.312606pt"
+       r="1.1136581"
+       cy="143.81544"
+       cx="49.804638">
       <title
          id="title5940">Bukraal (59 pops)</title>
     </circle>
-    <circle
+    <ellipse
        id="circle5946"
-       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.15630288pt"
-       r="0.75546396"
-       cy="140.47939"
-       cx="50.148319">
+       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.234454pt"
+       cy="140.24426"
+       cx="49.801311"
+       rx="1.133196"
+       ry="1.1331959">
       <title
          id="title5944">Klaht (35 pops)</title>
-    </circle>
+    </ellipse>
     <circle
        id="circle5950"
-       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.10420193pt"
-       r="0.78151447"
-       cy="136.95027"
-       cx="50.122459">
+       style="fill:#abebc6;stroke:#27ae60;stroke-width:0.156303pt"
+       r="1.1722717"
+       cy="136.65976"
+       cx="49.821781">
       <title
          id="title5948">Baakrot (12 pops)</title>
     </circle>
     <text
        x="51.555149"
        y="137.71283"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3">1-25 pops</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3">1-25 pops</tspan></text>
     <text
        x="51.385086"
        y="141.42528"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3-1">25-50 pops</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-1">25-50 pops</tspan></text>
     <text
        x="51.445999"
        y="145.00415"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7-6-2">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3-1-9">50-75 pops</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-6-2"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-1-9">50-75 pops</tspan></text>
     <text
        x="51.336845"
        y="148.64362"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7-6-2-3">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3-1-9-1">&gt;75 pops</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-6-2-3"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-1-9-1">&gt;75 pops</tspan></text>
     <g
        id="g8896"
        transform="matrix(0.1953786,0,0,0.1953786,69.365952,136.01051)">
@@ -712,12 +666,10 @@
     <text
        x="71.678833"
        y="137.74321"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7-9">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3-4">Capital</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-9"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-4">Capital</tspan></text>
     <g
        id="g9108"
        transform="matrix(0.1953786,0,0,0.1953786,68.325105,138.14881)">
@@ -742,21 +694,17 @@
     <text
        x="71.721794"
        y="141.22325"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-7-9-7">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-3-4-8">City</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-9-7"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-4-8">City</tspan></text>
     <text
        x="48.022564"
        y="160.00227"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-8-4">
-      <tspan
-         style="font-size:4.23333311px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-9-5">Bypasses</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-8-4"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-9-5">Bypasses</tspan></text>
     <g
        id="g9092"
        transform="matrix(0.15630288,0,0,0.15630288,48.697011,169.6147)">
@@ -835,29 +783,195 @@
     <text
        x="51.641079"
        y="164.56508"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-0">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-3">Wormhole</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-0"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-3">Wormhole</tspan></text>
     <text
        x="51.727009"
        y="168.25995"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-0-6">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-3-1">L-Gate</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-0-6"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-3-1">L-Gate</tspan></text>
     <text
        x="51.684048"
        y="171.91185"
-       style="font-size:6.11150503px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none"
-       id="text11880-3-7-3-5-6-0-6-0">
-      <tspan
-         style="font-size:2.82222223px;stroke-width:0.06014905;stroke-miterlimit:4;stroke-dasharray:none;stroke:#333333;fill:#e6e6e6"
-         id="tspan13307-6-5-5-6-0-3-1-6">Gateway</tspan>
-    </text>
+       style="font-size:6.11151px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-0-6-0"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-3-1-6">Gateway</tspan></text>
+    <g
+       id="g836"
+       transform="matrix(0.68200501,0,0,0.68200501,48.360134,172.95879)">
+      <circle
+         style="opacity:1;vector-effect:none;fill:#aa87de;fill-opacity:1;stroke:#5a2ca0;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="path817"
+         cx="2.1055403"
+         cy="2.1214511"
+         r="0.65956682" />
+      <path
+         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#aa87de;fill-opacity:1;fill-rule:nonzero;stroke:#5a2ca0;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="M 1.3222656,0.26458333 1.0742188,0.36809896 0.26458333,1.3229167 0.51367188,1.5722656 0.66015625,1.4257812 1.0742188,1.8378906 l 0.4980468,-0.5 L 1.1601562,0.92578125 1.46875,0.6171875 H 1.7636719 V 1.0585938 H 2.46875 V 0.6171875 h 0.2949219 l 0.3085937,0.30859375 -0.4121094,0.41210935 0.5,0.5 0.4121094,-0.4121094 0.1464844,0.1464844 0.25,-0.2493489 -0.8085938,-0.95481774 -0.25,-0.10351563 z"
+         id="path846" />
+      <path
+         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#aa87de;fill-opacity:1;fill-rule:nonzero;stroke:#5a2ca0;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="M 1.322526,3.96875 1.0744792,3.8652344 0.26484374,2.9104166 0.51393234,2.6610677 0.66041664,2.8075521 1.0744792,2.3954427 l 0.4980468,0.5 -0.4121094,0.4121094 0.3085938,0.3085937 H 1.7639323 V 3.1747395 H 2.4690104 V 3.6161458 H 2.7639323 L 3.072526,3.3075521 2.6604166,2.8954427 l 0.5000001,-0.5 0.4121094,0.4121094 0.1464842,-0.1464844 0.25,0.2493489 L 3.1604167,3.8652344 2.9104166,3.96875 Z"
+         id="path846-3" />
+    </g>
+    <text
+       x="51.667564"
+       y="175.46956"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-0-6-0-3"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-3-1-6-6">Hyper-Relay</tspan></text>
+    <g
+       id="g836-7"
+       transform="matrix(0.68200501,0,0,0.68200501,48.480136,176.628)">
+      <g
+         transform="matrix(0.64520863,0,0,0.64520863,2.4575762,3.0582455)"
+         id="g4339">
+        <path
+           style="fill:#e9c6af;stroke:#ac9d93;stroke-width:0.33pt"
+           d="M -1.3485192,-1.4593401 -0.52837103,0.18095616 0.29177711,-1.4593401 -0.52837103,-3.0996364 Z"
+           id="path4337" />
+      </g>
+      <path
+         id="path846-6-7"
+         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#aa87de;fill-opacity:1;fill-rule:nonzero;stroke:#5a2ca0;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="M 2.7817736,3.7028466 1.5875,3.7041666 1.5871346,3.3515484 l 0.207186,3.653e-4 0.00146,-0.5846521 0.7059673,0.00146 1e-7,0.5831905 0.2852889,-0.017225 z M 2.9894992,0.37653156 3.834908,1.2200806 3.5858276,1.4696777 3.4395833,1.3229167 3.0251383,1.7352946 2.5269775,1.2350668 2.9393554,0.82268879 2.7254458,0.63313909 Z m -1.7456651,0 L 0.3984253,1.2200806 0.64750569,1.4696777 0.79374999,1.3229167 1.208195,1.7352946 1.7063558,1.2350667 1.2939779,0.8226888 1.5078874,0.6331391 Z" />
+    </g>
+    <text
+       x="51.652725"
+       y="179.1248"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-0-6-0-3-5"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-3-1-6-6-3">Quantum Catapult</tspan></text>
+    <circle
+       cx="49.848415"
+       cy="151.08496"
+       r="1.1227477"
+       style="fill:none;stroke:#2e4053;stroke-width:0.160392pt"
+       id="circle5024" />
+    <text
+       x="51.361515"
+       y="152.00471"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-7-9-7-5"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-3-4-8-6">Orbital Ring</tspan></text>
+    <text
+       x="3.9868357"
+       y="189.82053"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-9-3"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-3-6">Fleets</tspan></text>
+    <text
+       x="7.9311862"
+       y="197.21611"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-9-5"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-22-6">Friendly</tspan></text>
+    <text
+       x="7.8185129"
+       y="200.88498"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-9-5-2"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-22-6-9">Hostile</tspan></text>
+    <path
+       style="fill:#f2d7d5;stroke:#a93226;stroke-width:0.32079495;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 5.5483261,198.44516 -1.0680698,0.79888 0.599161,1.33726 h 0.9378174 l 0.599161,-1.33726 z"
+       id="path7124">
+      <title
+         id="title7122">Reggam Squadron (10.0K)</title>
+    </path>
+    <path
+       style="fill:#afe9c6;stroke:#217844;stroke-width:0.32079495;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 5.5808893,194.87964 -1.0355068,0.75546 0.566598,1.31554 h 0.9378174 l 0.5665978,-1.31554 z"
+       id="path4659">
+      <title
+         id="title4657">Hurricane (3042)</title>
+    </path>
+    <path
+       style="fill:#aeb6bf;stroke:#2e4053;stroke-width:0.32079495;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 5.6134521,191.31412 -1.0029434,0.71204 0.5340348,1.29384 h 0.9378174 l 0.5340348,-1.29384 z"
+       id="path5198">
+      <title
+         id="title5196">Aggressive Drone Expansion Fleet (297)</title>
+    </path>
+    <text
+       x="48.309273"
+       y="189.98494"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-9-3-1"><tspan
+         style="font-size:4.23333px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-3-6-2">Battles</tspan></text>
+    <g
+       transform="matrix(0.1302524,0,0,0.1302524,49.036751,191.72535)"
+       id="g8900"
+       style="stroke-width:0.999926;stroke-miterlimit:4;stroke-dasharray:none">
+      <svg
+         id="svg8898"
+         version="1.1"
+         viewBox="0 0 4.2333333 4.2333333"
+         height="16"
+         width="16"
+         style="stroke-width:0.264564;stroke-miterlimit:4;stroke-dasharray:none">
+        <path
+           id="path8892-7"
+           d="m 3.9032652,3.6587341 -2.1e-6,0.3100163 H 3.5932446 L 2.8181974,3.1937043 2.5081748,3.5037206 H 2.1981563 V 3.1937043 L 2.3531676,3.0386908 0.52916641,1.3229163 0.33804028,0.4035255 1.3229163,0.79374967 2.9732077,2.4186581 3.1282159,2.2636447 H 3.4382344 V 2.573661 L 3.1282169,2.8836879 Z"
+           style="vector-effect:none;fill:#e6e6e6;fill-opacity:1;stroke:#666666;stroke-width:0.264564;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+        <path
+           style="opacity:1;vector-effect:none;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.264564;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           d="M 2.38125,2.9104166 V 1.8520833"
+           id="path8894" />
+        <path
+           id="path8896"
+           d="m 0.25159997,3.6747073 2.11e-6,0.3100195 0.31001846,2.1e-6 0.77504716,-0.7750493 0.3100227,0.3100185 0.3100185,-2.1e-6 V 3.2096775 L 1.8016975,3.0546704 3.4395828,1.3229163 3.8168249,0.41950295 2.9104162,0.79374967 1.1816575,2.4346293 1.0266493,2.279619 H 0.71663082 V 2.5896385 L 1.0266482,2.8996591 Z"
+           style="vector-effect:none;fill:#afe9c6;fill-opacity:1;stroke:#217844;stroke-width:0.264564;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      </svg>
+    </g>
+    <g
+       transform="matrix(0.1302524,0,0,0.1302524,49.06233,195.29545)"
+       id="g7364">
+      <svg
+         id="svg7362"
+         version="1.1"
+         viewBox="0 0 4.2333333 4.2333333"
+         height="16"
+         width="16">
+        <path
+           style="opacity:1;vector-effect:none;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           d="M 2.38125,2.9104166 V 1.8520833"
+           id="path7356" />
+        <path
+           id="path7358"
+           d="m 0.25159997,3.6747073 2.11e-6,0.3100195 0.31001846,2.1e-6 0.77504716,-0.7750493 0.3100227,0.3100185 0.3100185,-2.1e-6 V 3.2096775 L 1.8016975,3.0546704 3.4395828,1.3229163 3.8168249,0.41950295 2.9104162,0.79374967 1.1816575,2.4346293 1.0266493,2.279619 H 0.71663082 V 2.5896385 L 1.0266482,2.8996591 Z"
+           style="vector-effect:none;fill:#e6e6e6;fill-opacity:1;stroke:#666666;stroke-width:0.176389;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+        <path
+           id="path7360"
+           d="m 3.9032652,3.6587341 -2.1e-6,0.3100163 H 3.5932446 L 2.8181974,3.1937043 2.5081748,3.5037206 H 2.1981563 V 3.1937043 L 2.3531676,3.0386908 0.52916641,1.3229163 0.33804028,0.4035255 1.3229163,0.79374967 2.9732077,2.4186581 3.1282159,2.2636447 H 3.4382344 V 2.573661 L 3.1282169,2.8836879 Z"
+           style="vector-effect:none;fill:#f2d7d5;fill-opacity:1;stroke:#a93226;stroke-width:0.176389;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      </svg>
+    </g>
+    <text
+       x="51.571579"
+       y="193.54431"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-9-0"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-22-9">Defender Victory</tspan></text>
+    <text
+       x="51.561115"
+       y="197.22659"
+       style="font-size:6.1115px;font-family:sans-serif;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+       id="text11880-3-7-3-5-6-9-0-3"><tspan
+         style="font-size:2.82222px;fill:#e6e6e6;stroke:#333333;stroke-width:0.0601491;stroke-miterlimit:4;stroke-dasharray:none"
+         id="tspan13307-6-5-5-6-0-22-9-6">Attacker Victory</tspan></text>
   </g>
 </svg>

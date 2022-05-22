@@ -10,6 +10,8 @@ import (
 const (
 	countryFontSize = 8.0
 
+	colorBackground = "#2e4053"
+
 	colorPrimaryStroke = "#212f3c"
 	colorPrimaryFill   = "#f2f2f2"
 
@@ -33,6 +35,11 @@ const (
 )
 
 var (
+	backgroundStyle = NewStyle(
+		StyleOption{"stroke", "none"},
+		StyleOption{"fill", colorBackground},
+	)
+
 	gridStyle = NewStyle(
 		StyleOption{"stroke-width", "0.33pt"},
 		StyleOption{"stroke", "#e5e8e8"},
@@ -113,10 +120,15 @@ var (
 
 	starTextStyle = NewStyle(
 		StyleOption{"font-family", "sans-serif"},
-		StyleOption{"font-size", "3.6pt"},
+		StyleOption{"font-size", "3.2pt"},
 		StyleOption{"stroke-width", "0.08pt"},
 		StyleOption{"stroke", colorPrimaryStroke},
 		StyleOption{"fill", colorPrimaryFill},
+	)
+
+	battleTextStyle = starTextStyle.With(
+		StyleOption{"font-size", "2.4pt"},
+		StyleOption{"stroke-width", "0.08pt"},
 	)
 
 	countryTextStyle = NewStyle(

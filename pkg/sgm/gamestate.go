@@ -68,7 +68,7 @@ func LoadGameState(path string) (*GameState, error) {
 		state.linkStarRefs(starId, star)
 	}
 	for _, planet := range state.Planets.Planets {
-		if planet.OrbitalFleetId != DefaultFleetId {
+		if planet != nil && planet.OrbitalFleetId != DefaultFleetId {
 			planet.OrbitalFleet = state.Fleets[planet.OrbitalFleetId]
 		}
 	}

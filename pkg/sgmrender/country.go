@@ -434,8 +434,8 @@ func (r *Renderer) renderCountryNames(countries []countryRenderContext) {
 	}
 
 	legendPoint := sgmmath.Point{
-		X: r.bounds.Min.X,
-		Y: r.bounds.Max.Y - float64(len(smallCountries))*0.6*countryFontSize,
+		X: r.innerBounds.Min.X,
+		Y: r.innerBounds.Max.Y - float64(len(smallCountries))*0.6*countryFontSize,
 	}
 	for idx, name := range smallCountryNames {
 		r.createText(r.canvas, countryLegendStyle, legendPoint,
@@ -477,7 +477,7 @@ starLoop:
 		} else if seg.bounds.Max.X-starPoint.X < requiredWidth/2 {
 			starPoint.X -= requiredWidth / 4
 		}
-		if star.IsSignificant() {
+		if star.IsSignificant() || len(star.Battles) > 0 {
 			starPoint.Y += fontSize + countryFontSize/2
 		}
 
@@ -504,7 +504,7 @@ starLoop:
 			var probeOffset float64
 			if !adjNode.AdjStar.IsOwnedBy(seg.countryId) {
 				probeOffset = 0.5
-			} else if adjNode.AdjStar.IsSignificant() {
+			} else if adjNode.AdjStar.IsSignificant() || len(adjNode.AdjStar.Battles) > 0 {
 				probeOffset = 0.8
 			} else {
 				continue

@@ -91,3 +91,10 @@ func (rect *BoundingRect) Contains(other BoundingRect) bool {
 func (rect *BoundingRect) Size() (float64, float64) {
 	return math.Abs(rect.Max.X - rect.Min.X), math.Abs(rect.Max.Y - rect.Min.Y)
 }
+
+func (rect *BoundingRect) Expand(padding float64) {
+	rect.Min.X -= padding
+	rect.Min.Y -= padding
+	rect.Max.X += padding
+	rect.Max.Y += padding
+}

@@ -16,11 +16,9 @@ const (
 	footerText = "Made with Stellaris Galaxy Map"
 
 	canvasPadding = 40
-	canvasWidth   = 2160
-	canvasHeight  = 2160
+	canvasSize    = 2160
 
-	fontSize = 2.4
-
+	fontSize         = 2.0
 	maxCellSize      = 48.0
 	countryBorderGap = 1.2
 
@@ -65,16 +63,14 @@ func NewRenderer(state *sgm.GameState) *Renderer {
 	r.doc = etree.NewDocument()
 	r.doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 
+	w, h := r.bounds.Size()
 	r.canvas = r.doc.CreateElement("svg")
-	r.canvas.CreateAttr("width", fmt.Sprint(canvasWidth))
-	r.canvas.CreateAttr("height", fmt.Sprint(canvasHeight))
+	r.canvas.CreateAttr("xmlns", "http://www.w3.org/2000/svg")
+	r.canvas.CreateAttr("width", fmt.Sprint(w/h*canvasSize))
+	r.canvas.CreateAttr("height", fmt.Sprint(canvasSize))
 	r.canvas.CreateAttr("viewBox",
 		fmt.Sprintf("%f %f %f %f",
-			r.bounds.Min.X-canvasPadding,
-			r.bounds.Min.Y-canvasPadding,
-			r.bounds.Max.X-r.bounds.Min.X+2*canvasPadding,
-			r.bounds.Max.Y-r.bounds.Min.Y+2*canvasPadding))
-	r.canvas.CreateAttr("xmlns", "http://www.w3.org/2000/svg")
+			r.bounds.Min.X, r.bounds.Min.Y, w, h))
 
 	r.defs = r.canvas.CreateElement("defs")
 
@@ -114,9 +110,14 @@ func (r *Renderer) computeBounds() {
 	for _, star := range r.state.Stars {
 		r.bounds.Add(star.Point())
 	}
+
+	r.innerBounds = r.bounds
+	r.bounds.Expand(canvasPadding)
 }
 
 func (r *Renderer) Render() {
+	r.createRect(r.canvas, backgroundStyle, r.bounds)
+
 	countries := r.renderCountries()
 	r.renderGrid()
 	r.renderHyperlanes()
@@ -132,7 +133,7 @@ func (r *Renderer) Render() {
 		r.renderStarName(ctx)
 	}
 
-	titlePoint := r.bounds.Min
+	titlePoint := r.innerBounds.Min
 	r.createText(r.canvas, countryTextStyle, titlePoint, mapTitle)
 	titlePoint.Y += countryFontSize
 	r.createText(r.canvas, countryLegendStyle, titlePoint, r.state.Name)
@@ -141,7 +142,7 @@ func (r *Renderer) Render() {
 		fmt.Sprintf("Year %d", r.state.Date.Year()))
 
 	footerStyle := starTextStyle.With(StyleOption{"text-anchor", "end"})
-	footerPoint := r.bounds.Max.Add(sgmmath.Point{0.0, -2 * fontSize})
+	footerPoint := r.innerBounds.Max.Add(sgmmath.Point{0.0, -2 * fontSize})
 	r.createText(r.canvas, footerStyle, footerPoint, footerText)
 }
 
@@ -172,10 +173,10 @@ func (r *Renderer) createRect(el *etree.Element, style Style, rect sgmmath.Bound
 	w, h := rect.Size()
 	rectEl := el.CreateElement("rect")
 	rectEl.CreateAttr("style", style.String())
-	rectEl.CreateAttr("x", fmt.Sprintf("%f", rect.Min.X))
-	rectEl.CreateAttr("y", fmt.Sprintf("%f", rect.Min.Y))
-	rectEl.CreateAttr("width", fmt.Sprintf("%f", w))
-	rectEl.CreateAttr("height", fmt.Sprintf("%f", h))
+	rectEl.CreateAttr("x", fmt.Sprintf("%.4f", rect.Min.X))
+	rectEl.CreateAttr("y", fmt.Sprintf("%.4f", rect.Min.Y))
+	rectEl.CreateAttr("width", fmt.Sprintf("%.4f", w))
+	rectEl.CreateAttr("height", fmt.Sprintf("%.4f", h))
 	return rectEl
 }
 
@@ -183,9 +184,9 @@ func (r *Renderer) createCircle(
 	el *etree.Element, style Style, center sgmmath.Point, radius float64,
 ) *etree.Element {
 	circleEl := el.CreateElement("circle")
-	circleEl.CreateAttr("cx", fmt.Sprintf("%f", center.X))
-	circleEl.CreateAttr("cy", fmt.Sprintf("%f", center.Y))
-	circleEl.CreateAttr("r", fmt.Sprintf("%f", radius))
+	circleEl.CreateAttr("cx", fmt.Sprintf("%.4f", center.X))
+	circleEl.CreateAttr("cy", fmt.Sprintf("%.4f", center.Y))
+	circleEl.CreateAttr("r", fmt.Sprintf("%.4f", radius))
 	circleEl.CreateAttr("style", style.String())
 	return circleEl
 }
@@ -194,8 +195,8 @@ func (r *Renderer) createText(
 	el *etree.Element, style Style, point sgmmath.Point, text string,
 ) *etree.Element {
 	textEl := el.CreateElement("text")
-	textEl.CreateAttr("x", fmt.Sprintf("%f", point.X))
-	textEl.CreateAttr("y", fmt.Sprintf("%f", point.Y))
+	textEl.CreateAttr("x", fmt.Sprintf("%.4f", point.X))
+	textEl.CreateAttr("y", fmt.Sprintf("%.4f", point.Y))
 	textEl.CreateAttr("style", style.String())
 	textEl.CreateText(text)
 	return textEl

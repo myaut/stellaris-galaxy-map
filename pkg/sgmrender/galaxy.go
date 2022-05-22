@@ -2,6 +2,7 @@ package sgmrender
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"sort"
 	"strings"
@@ -12,6 +13,11 @@ import (
 	"github.com/myaut/stellaris-galaxy-map/pkg/sgmmath"
 )
 
+const (
+	battleLossThreshold = 3
+	battleRecentYears   = 4
+)
+
 type starRenderContext struct {
 	starId sgm.StarId
 	star   *sgm.Star
@@ -20,6 +26,9 @@ type starRenderContext struct {
 	iconOffset                      float64
 	nameOffsetTop, nameOffsetBottom float64
 	quadrant                        int
+
+	battleYear int
+	battleRef  sgm.BattleRef
 }
 
 func (r *Renderer) renderStars() (stars []*starRenderContext) {
@@ -31,8 +40,10 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 		ctx.g = r.canvas.CreateElement("g")
 		ctx.g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", p.X, p.Y))
 
+		ctx.battleYear, ctx.battleRef = r.findBattle(star)
+
 		// Render starbase if one exists, otherwise render
-		if star.PrimaryStarbase() == nil || !star.IsSignificant() {
+		if (star.PrimaryStarbase() == nil || !star.IsSignificant()) && ctx.battleYear == 0 {
 			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
 			continue
 		}
@@ -44,6 +55,10 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 
 func (r *Renderer) renderStarbase(ctx *starRenderContext) {
 	starbase := ctx.star.PrimaryStarbase()
+	if starbase == nil {
+		return
+	}
+
 	lostControl := ctx.star.Occupier() != sgm.DefaultCountryId
 	if starbase.Level == sgm.StarbaseOutpost {
 		style := outpostStyle
@@ -84,6 +99,7 @@ func (r *Renderer) renderStarbase(ctx *starRenderContext) {
 func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
 	// Fleets
 	r.renderAllFleets(ctx)
+	r.renderBattle(ctx)
 
 	// Other features
 	megastructures := ctx.star.MegastructuresBySize(sgm.MegastructureSizeStar)
@@ -148,14 +164,13 @@ func (r *Renderer) renderAllFleets(ctx *starRenderContext) {
 	allFleets := ctx.star.MobileMilitaryFleets()
 	fleetGroups := make([][]*sgm.Fleet, sgm.WarRoleMax)
 	for _, fleet := range allFleets {
-		role := fleet.Role(ctx.star)
+		role := sgm.ComputeWarRole(fleet.OwnerId, fleet.Owner, ctx.star)
 		fleetGroups[role] = append(fleetGroups[role], fleet)
 	}
 
 	for role, fleets := range fleetGroups {
 		r.renderFleets(ctx, sgm.WarRole(role), fleets)
 	}
-
 }
 
 func (r *Renderer) renderFleets(ctx *starRenderContext, role sgm.WarRole, fleets []*sgm.Fleet) {
@@ -290,34 +305,98 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 
 	if planet.Designation == sgm.PlanetDesignationCapital {
 		r.createIcon(ctx.g, point, "colony-capital", iconSizeMd)
-	} else if planet.Class == sgm.PlanetClassEcumenopolis {
+	}
+	if planet.Class == sgm.PlanetClassEcumenopolis {
 		r.createIcon(ctx.g, point, "colony-ecumenopolis", iconSizeMd)
 	}
 }
 
+func (r *Renderer) findBattle(star *sgm.Star) (year int, ref sgm.BattleRef) {
+	for _, battleRef := range star.Battles {
+		battle := r.state.Wars[battleRef.WarId].Battles[battleRef.BattleIndex]
+		if battle.AttackerLosses+battle.DefenderLosses < battleLossThreshold {
+			continue
+		}
+		if battleYear := battle.Date.Year(); battleYear > year {
+			ref, year = battleRef, battleYear
+		}
+	}
+
+	if year < r.state.Date.Year()-battleRecentYears {
+		year = 0
+	}
+	return
+}
+
+func (r *Renderer) renderBattle(ctx *starRenderContext) {
+	if ctx.battleYear == 0 {
+		return
+	}
+
+	// Recompute winner into its role in specified system: either it is
+	// defending it or trying to conquer
+	war := r.state.Wars[ctx.battleRef.WarId]
+	battle := war.Battles[ctx.battleRef.BattleIndex]
+	winnerId := war.Defenders[0].CountryId
+	if battle.AttackerVictory {
+		winnerId = war.Attackers[0].CountryId
+	}
+	winner := r.state.Countries[winnerId]
+	role := sgm.ComputeWarRole(winnerId, winner, ctx.star)
+
+	var winnerIcon string
+	switch role {
+	case sgm.WarRoleStarAttacker:
+		winnerIcon = "attacker"
+	case sgm.WarRoleStarDefender:
+		winnerIcon = "defender"
+	case sgm.WarRoleStarNeutral:
+		// assume that battles on neutral territory are quite rare
+		log.Printf("warn: ignoring battle %v at %s", ctx.battleRef, ctx.star.Name())
+		return
+	}
+
+	battlePoint := sgmmath.Point{X: -ctx.iconOffset / 2}
+	if ctx.quadrant >= 0 {
+		battlePoint.Y = -ctx.iconOffset - ctx.nameOffsetTop - fontSize - iconSizeSm
+	} else {
+		battlePoint.Y = ctx.iconOffset + ctx.nameOffsetBottom + fontSize
+	}
+
+	r.createIcon(ctx.g, battlePoint, "battle-"+winnerIcon+"-won", iconSizeSm)
+	r.renderStarText(ctx, battleTextStyle, sgmmath.Point{iconSizeSm, 1.5 * fontSize},
+		fmt.Sprint(ctx.battleYear))
+}
+
 func (r *Renderer) renderStarName(ctx *starRenderContext) {
-	var textAnchor string
-	point := ctx.star.Point()
 	name := ctx.star.Name()
 	if strings.HasPrefix(name, "NAME_") {
 		name = strings.ReplaceAll(name[5:], "_", " ")
 	}
 
+	r.renderStarText(ctx, starTextStyle, sgmmath.Point{}, name)
+}
+
+func (r *Renderer) renderStarText(
+	ctx *starRenderContext, style Style, off sgmmath.Point, text string,
+) {
+	var textAnchor string
+	point := ctx.star.Point()
 	switch ctx.quadrant {
 	case 0, -1:
 		textAnchor = "start"
-		point.X -= 2 * ctx.iconOffset / 3
+		point.X -= 2*ctx.iconOffset/3 - off.X
 	case 1, -2:
 		textAnchor = "end"
-		point.X += 2 * ctx.iconOffset / 3
+		point.X += 2*ctx.iconOffset/3 - off.X
 	}
 	if ctx.quadrant >= 0 {
-		point.Y -= ctx.iconOffset/2 + 2*fontSize/3 + ctx.nameOffsetTop
+		point.Y -= ctx.iconOffset/2 + 2*fontSize/3 + ctx.nameOffsetTop + off.Y
 	} else {
-		point.Y += ctx.iconOffset + fontSize + ctx.nameOffsetBottom
+		point.Y += ctx.iconOffset + fontSize + ctx.nameOffsetBottom + off.Y
 	}
 
-	textEl := r.createText(r.canvas, starTextStyle, point, name)
+	textEl := r.createText(r.canvas, style, point, text)
 	textEl.CreateAttr("text-anchor", textAnchor)
 }
 

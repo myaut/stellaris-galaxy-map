@@ -345,38 +345,6 @@ func (fleet *Fleet) MilitaryPowerString() string {
 	return fmt.Sprintf("%.f", fleet.MilitaryPower)
 }
 
-func (fleet *Fleet) Role(s *Star) WarRole {
-	if len(fleet.Owner.Wars) == 0 {
-		return WarRoleStarNeutral
-	}
-
-	countryId := s.Owner()
-	if fleet.OwnerId == countryId {
-		return WarRoleStarDefender
-	}
-
-	for _, warRef := range fleet.Owner.Wars {
-		allyList, enemyList := warRef.War.Defenders, warRef.War.Attackers
-		if warRef.IsAttacker {
-			allyList, enemyList = enemyList, allyList
-		}
-
-		for _, country := range enemyList {
-			if country.CountryId == countryId {
-				return WarRoleStarAttacker
-			}
-		}
-		for _, country := range allyList {
-			if country.CountryId == countryId {
-				return WarRoleStarDefender
-			}
-		}
-	}
-
-	// These fleets are merely passing by
-	return WarRoleStarNeutral
-}
-
 type ShipId uint32
 type Ship struct {
 	FleetId FleetId `sgm:"fleet,id"`
@@ -426,4 +394,36 @@ type WarRef struct {
 type BattleRef struct {
 	WarId       WarId
 	BattleIndex int
+}
+
+func ComputeWarRole(countryId CountryId, country *Country, s *Star) WarRole {
+	if len(country.Wars) == 0 {
+		return WarRoleStarNeutral
+	}
+
+	starCountryId := s.Owner()
+	if starCountryId == countryId {
+		return WarRoleStarDefender
+	}
+
+	for _, warRef := range country.Wars {
+		allyList, enemyList := warRef.War.Defenders, warRef.War.Attackers
+		if warRef.IsAttacker {
+			allyList, enemyList = enemyList, allyList
+		}
+
+		for _, country := range enemyList {
+			if country.CountryId == starCountryId {
+				return WarRoleStarAttacker
+			}
+		}
+		for _, country := range allyList {
+			if country.CountryId == starCountryId {
+				return WarRoleStarDefender
+			}
+		}
+	}
+
+	// These fleets are merely passing by
+	return WarRoleStarNeutral
 }
