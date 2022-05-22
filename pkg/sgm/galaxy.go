@@ -18,10 +18,12 @@ const (
 
 	PlanetDesignationCapital = "col_capital"
 
-	BypassWormhole      = "wormhole"
-	BypassLGate         = "lgate"
-	BypassGateway       = "gateway"
-	BypassGatewayRuined = "gateway-ruined"
+	BypassWormhole        = "wormhole"
+	BypassLGate           = "lgate"
+	BypassGateway         = "gateway"
+	BypassGatewayRuined   = "gateway-ruined"
+	BypassHyperRelay      = "relay"
+	BypassQuantumCatapult = "catapult"
 )
 
 var DefaultStarId = StarId(math.MaxUint32)
@@ -127,9 +129,22 @@ func (s *Star) Bypasses() (bypasses []string) {
 			} else {
 				bypasses = append(bypasses, BypassGatewayRuined)
 			}
+		case MegastructureHyperRelay:
+			bypasses = append(bypasses, BypassHyperRelay)
+		case MegastructureQuantumCatapult:
+			bypasses = append(bypasses, BypassQuantumCatapult)
 		}
 	}
 	return bypasses
+}
+
+func (s *Star) HasHyperRelay() bool {
+	for _, ms := range s.Megastructures {
+		if ms.Type == MegastructureHyperRelay {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Star) HasSignificantMegastructures() bool {
@@ -277,6 +292,9 @@ type Planet struct {
 	Moons  []PlanetId `sgm:"moons"`
 	MoonOf PlanetId   `sgm:"moon_of"`
 
+	OrbitalFleetId FleetId `sgm:"orbital_defence,id"`
+	OrbitalFleet   *Fleet
+
 	EmployablePops int `sgm:"employable_pops"`
 }
 
@@ -289,4 +307,11 @@ func (p *Planet) Name() string {
 		return p.NameString
 	}
 	return p.NameStruct.Key
+}
+
+func (p *Planet) OrbitalStarbase() *Starbase {
+	if p.OrbitalFleet != nil {
+		return p.OrbitalFleet.Starbase
+	}
+	return nil
 }

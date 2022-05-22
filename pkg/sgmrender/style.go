@@ -101,9 +101,14 @@ var (
 
 	basePlanetStyle = NewStyle(
 		StyleOption{"stroke-width", "0.4pt"},
-		StyleOption{"stroke-alignment", "inner"},
 		StyleOption{"stroke", colorPlanetStroke},
 		StyleOption{"fill", colorPlanetFill},
+	)
+
+	planetRingStyle = NewStyle(
+		StyleOption{"stroke-width", "0.4pt"},
+		StyleOption{"stroke", colorFleetStroke},
+		StyleOption{"fill", "none"},
 	)
 
 	starTextStyle = NewStyle(

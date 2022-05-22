@@ -50,8 +50,10 @@ const (
 	MegastructureShipyard             = "mega_shipyard"
 	MegastructureStrategicCenter      = "strategic_coordination_center"
 
-	MegastructureGateway = "gateway"
-	MegastructureLGate   = "lgate_base"
+	MegastructureGateway         = "gateway"
+	MegastructureLGate           = "lgate_base"
+	MegastructureHyperRelay      = "hyper_relay"
+	MegastructureQuantumCatapult = "quantum_catapult"
 
 	MegastructureSizeRingWorld = 3
 	MegastructureSizeStar      = 2
@@ -289,6 +291,8 @@ func (m Megastructure) TypeStage() (string, int) {
 	return m.Type, 0
 }
 
+var DefaultFleetId = FleetId(math.MaxUint32)
+
 type FleetId uint32
 type Fleet struct {
 	NameString string `sgm:"name"`
@@ -309,6 +313,8 @@ type Fleet struct {
 
 	ShipIds []ShipId `sgm:"ships"`
 	Ships   []*Ship
+
+	Starbase *Starbase
 }
 
 func (f *Fleet) Name() string {

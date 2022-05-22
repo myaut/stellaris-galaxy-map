@@ -164,7 +164,7 @@ func (r *Renderer) renderFleets(ctx *starRenderContext, role sgm.WarRole, fleets
 	}
 
 	fleetPoint := sgmmath.Point{
-		Y: -ctx.iconOffset - fleetHalfSize,
+		Y: -ctx.iconOffset - fleetHalfSize/2,
 	}
 	step := fleetStep
 
@@ -178,10 +178,10 @@ func (r *Renderer) renderFleets(ctx *starRenderContext, role sgm.WarRole, fleets
 	case sgm.WarRoleStarDefender:
 		ctx.nameOffsetTop += fleetHalfSize + fleetStep
 		step = -step
-		fleetPoint.X = -fleetHalfSize / 2
+		fleetPoint.X = -fleetHalfSize
 	case sgm.WarRoleStarAttacker:
 		ctx.nameOffsetTop += fleetHalfSize + fleetStep
-		fleetPoint.X = fleetHalfSize / 2
+		fleetPoint.X = fleetHalfSize
 	}
 
 	var extraFleets int
@@ -257,18 +257,31 @@ func (r *Renderer) renderMegastructure(
 func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, planet *sgm.Planet) {
 	radius := float64(iconSizeMd) / 2
 	center := point.Add(sgmmath.Point{radius, radius})
-	style := basePlanetStyle
+
+	strokeWidth := 0.4
+	iconPoint := point
+	if planet.OrbitalStarbase() != nil {
+		r.createCircle(ctx.g, planetRingStyle, center, radius)
+
+		strokeWidth -= 0.2
+		radius -= 0.6
+		iconPoint = iconPoint.Add(sgmmath.Point{0.6, 0.6})
+	}
+
 	switch {
 	case planet.EmployablePops > 50:
-		style = style.With(StyleOption{"stroke-width", "0.8pt"})
+		strokeWidth += 0.4
 		radius -= 0.4
 	case planet.EmployablePops > 25:
-		style = style.With(StyleOption{"stroke-width", "0.6pt"})
+		strokeWidth += 0.2
 		radius -= 0.2
 	default:
 		radius -= 0.1
 	}
 
+	style := basePlanetStyle.With(
+		StyleOption{"stroke-width", fmt.Sprintf("%.1fpt", strokeWidth)},
+	)
 	title := fmt.Sprintf("%s (%d pops)", planet.Name(), planet.EmployablePops)
 	r.createTitle(r.createCircle(ctx.g, style, center, radius), title)
 	if planet.EmployablePops > 75 {
@@ -312,13 +325,20 @@ func (r *Renderer) renderHyperlanes() {
 	renderedStars := make(map[sgm.StarId]struct{})
 
 	for starId, star := range r.state.Stars {
+		hasRelay := star.HasHyperRelay()
+
 		for _, hyperlane := range star.Hyperlanes {
 			if _, isRendered := renderedStars[hyperlane.ToId]; isRendered {
 				continue
 			}
 
+			style := hyperlaneStyle
+			if hasRelay && hyperlane.To.HasHyperRelay() {
+				style = style.With(StyleOption{"stroke-width", "0.8pt"})
+			}
+
 			pv := sgmmath.NewVector(star, hyperlane.To).ToPolar()
-			r.createPath(r.canvas, hyperlaneStyle,
+			r.createPath(r.canvas, style,
 				NewPath().
 					MoveToPoint(pv.PointAtLength(2*starHalfSize)).
 					LineToPoint(pv.PointAtLength(pv.Length-2*starHalfSize)))

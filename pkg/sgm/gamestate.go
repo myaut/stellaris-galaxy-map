@@ -67,15 +67,13 @@ func LoadGameState(path string) (*GameState, error) {
 	for starId, star := range state.Stars {
 		state.linkStarRefs(starId, star)
 	}
+	for _, planet := range state.Planets.Planets {
+		if planet.OrbitalFleetId != DefaultFleetId {
+			planet.OrbitalFleet = state.Fleets[planet.OrbitalFleetId]
+		}
+	}
 	for countryId, country := range state.Countries {
 		state.linkCountryRefs(countryId, country)
-	}
-	for starbaseId, starbase := range state.StarbaseMgr.Starbases {
-		if starbase != nil {
-			starbase.Station = state.Ships[starbase.StationId]
-		} else {
-			log.Printf("warn: starbase #%d is nil", starbaseId)
-		}
 	}
 	for _, fleet := range state.Fleets {
 		state.linkFleetRefs(fleet)
@@ -85,6 +83,16 @@ func LoadGameState(path string) (*GameState, error) {
 			ship.Fleet = state.Fleets[ship.FleetId]
 		} else {
 			log.Printf("warn: ship #%d is nil", shipId)
+		}
+	}
+	for starbaseId, starbase := range state.StarbaseMgr.Starbases {
+		if starbase != nil {
+			starbase.Station = state.Ships[starbase.StationId]
+			if starbase.Station != nil && starbase.Station.Fleet != nil {
+				starbase.Station.Fleet.Starbase = starbase
+			}
+		} else {
+			log.Printf("warn: starbase #%d is nil", starbaseId)
 		}
 	}
 	for warId, war := range state.Wars {

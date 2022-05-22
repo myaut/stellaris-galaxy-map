@@ -120,7 +120,7 @@ func (r *Renderer) pickTextQuadrant(starId sgm.StarId) int {
 			weight += 1.0
 		}
 
-		points := weight / (adjNode.Vector.Length * adjNode.Vector.Length)
+		points := weight / adjNode.Vector.Length
 		quadrantWeight[quadrant] += points
 
 		// If too close to the quadrant's edge, account to neighboring qudrant too
