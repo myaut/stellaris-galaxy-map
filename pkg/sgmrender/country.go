@@ -350,13 +350,15 @@ func (r *Renderer) renderCountries() []countryRenderContext {
 	})
 	occupierPatters := make(map[sgm.CountryId]struct{})
 	for _, seg := range occupiedSegs {
+		country := r.state.Countries[seg.countryId]
 		patternId := fmt.Sprintf("occupied-by-%d", seg.countryId)
 		if _, hasPattern := occupierPatters[seg.countryId]; !hasPattern {
 			r.createCountryPattern(seg.countryId, patternId)
 			occupierPatters[seg.countryId] = struct{}{}
 		}
 
-		style := NewStyle(
+		style := occupationCountryStyle.With(
+			StyleOption{"stroke", getCountryMapColor(country.Flag.Colors[1], DefaultCountryBorderColor)},
 			StyleOption{"fill", fmt.Sprintf("url(#%s)", patternId)},
 		)
 		r.createPath(r.canvas, style, cr.buildPath(seg))
@@ -452,6 +454,7 @@ func (r *Renderer) countryNameLines(name string) (lines []string, maxLineLength 
 				append(lines[:i-1], fmt.Sprintf("%s %s", lines[i-1], line)),
 				lines[i+1:]...,
 			)
+			break
 		}
 	}
 	for _, line := range lines {

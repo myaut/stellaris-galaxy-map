@@ -151,9 +151,13 @@ var (
 		StyleOption{"fill-rule", "evenodd"},
 	)
 
+	occupationCountryStyle = NewStyle(
+		StyleOption{"stroke-dasharray", "1.0,1.0"},
+	)
+
 	occupationPatternStyle = NewStyle(
-		StyleOption{"stroke-width", "0.5pt"},
-		StyleOption{"stroke-opacity", "0.6"},
+		StyleOption{"stroke-width", "1pt"},
+		StyleOption{"stroke-opacity", "0.8"},
 	)
 
 	fleetTextStyle = NewStyle(

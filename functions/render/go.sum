@@ -48,6 +48,12 @@ github.com/myaut/stellaris-galaxy-map v0.0.0-20220516221442-4b79987c3b2a h1:qdgC
 github.com/myaut/stellaris-galaxy-map v0.0.0-20220516221442-4b79987c3b2a/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
 github.com/myaut/stellaris-galaxy-map v0.0.0-20220516224613-9a081fb57397 h1:I4sl5ODeoHD12CAenyQmWJwdwASqFCg6ATl8+GW3ZbM=
 github.com/myaut/stellaris-galaxy-map v0.0.0-20220516224613-9a081fb57397/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220519094610-16760b7e8e0b h1:dq7UCTR2INUzJzFlxeGHZxldFC6Lc0/kka6BXpr8+ss=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220519094610-16760b7e8e0b/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220519153650-de3ed5456c4d h1:+7okpjSIySkWSEOlE8sj3IRCM783JvYJZepLqTCUTF4=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220519153650-de3ed5456c4d/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220522202431-986d77823e75 h1:oWpDd83Pmo/zBd+MbZCg72hPx+jm8kP1eX2w2J2sGw4=
+github.com/myaut/stellaris-galaxy-map v0.0.0-20220522202431-986d77823e75/go.mod h1:sK5KcfKZTIxPmYawOp1o8WJ3pZTCYgSKEPQzLEyBlAM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f h1:YeUeWAPTrycaikVXiVoAu1dxIR4+tSsn9IbTkNfRsss=

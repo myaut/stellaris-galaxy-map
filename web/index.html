@@ -26,7 +26,18 @@
   <main>
     <div class="flex one-500 three-1200">
       <div>
-      
+        <p>
+          <img src="header-download.svg" />
+        </p>
+        
+        <p>
+          Download standalone version:
+          <ul>
+          <li><a href="cli/stellaris-galaxy-map.exe"> Windows </a></li>
+          <li><a href="cli/stellaris-galaxy-map-linux"> Linux x86_64 </a></li>
+          <li><a href="cli/stellaris-galaxy-map-macos"> MacOS Intel </a></li>
+          <ul>
+        <p>
       </div>
     
       <div>
@@ -35,7 +46,7 @@
         </p>
         
         <div id="upload-form">
-      
+          
         </div>
         
         <p>
@@ -63,6 +74,71 @@
           Save-game Editing</a> on a Stellaris wiki.
         </p>
         
+        <h3>Can SGM be run in standalone mode?</h3>
+        <p>
+          Yes, download binary from the left panel or use sources from 
+          <a href="https://github.com/myaut/stellaris-galaxy-map">GitHub</a>
+          and run <code>stellaris-galaxy-map-cli</code> manually.
+        </p>
+        
+        <h3>How to make timelapses?</h3>
+        <p>
+          <a href="#"><label for="legend-modal">
+            See more
+          </label></a>
+          
+          <div class="modal">
+            <input id="legend-modal" type="checkbox" />
+            <label for="legend-modal" class="overlay"></label>
+            <article>
+              <header>
+                <h3>Generating timelapses</h3>
+                <label for="legend-modal" class="close">&times;</label>
+              </header>
+              <section class="content">
+                <ol>
+                  <li> 
+                    To generate timelapse, you'll need to run standalone map 
+                    renderer without options:
+                    <pre>
+$ ./web/cli/stellaris-galaxy-map-linux
+...
+[ 7] - spacehawaii_-145960461
+...
+Select an empire:
+7</pre>
+                    It will offer list of empires available, pick one number and 
+                    enter its number.  
+                  </li>
+                  <li>
+                    Run Stellaris and play your empire with autosaves enabled. 
+                    Each time a save game will be generated, map renderer will 
+                    try to produce an SVG for it.
+                  </li>
+                  <li>
+                    When completed, you'll need to convert SVGs to video. This 
+                    can be done using <a href="https://inkscape.org/">Inkscape</a> 
+                    and <a href="https://ffmpeg.org/">FFmpeg</a>. Use the following
+                    script (for Linux):
+                    <pre>
+#!/bin/bash
+SIZE=2160
+
+for f in *.svg; do 
+    inkscape -w $SIZE -h $SIZE $f -o $f.png
+done
+
+ffmpeg -y -framerate 10 -pattern_type glob -i '*.png' \
+  -c:v libx264 -pix_fmt yuv420p timelapse.mp4
+</pre>
+                  
+                  </li>
+                </ol>
+              </section>
+            </article>
+          </div>
+        </p>
+        
         <h3>What is SVG?</h3>
         <p>
           <strong>SVG</strong> stands for Scalable Vector Graphics. It is a 
@@ -71,13 +147,6 @@
           It is supported by major browsers and can be edited with any 
           vector graphics editor such as <a href="https://inkscape.org/">
           Inkscape</a>.
-        </p>
-        
-        <h3>Can SGM be run in standalone mode?</h3>
-        <p>
-          Yes, but you will need to download sources from 
-          <a href="https://github.com/myaut/stellaris-galaxy-map">GitHub</a>
-          and run <code>stellaris-galaxy-map-cli</code> manually.
         </p>
       </div>
     </div>

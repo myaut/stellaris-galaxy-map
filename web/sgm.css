@@ -19,7 +19,7 @@ nav, footer {
 }
 
 
-code {
+code, pre {
 	background-color: var(--color-background-primary-dark);
 }
 
