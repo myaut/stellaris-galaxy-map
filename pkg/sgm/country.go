@@ -427,3 +427,12 @@ func ComputeWarRole(countryId CountryId, country *Country, s *Star) WarRole {
 	// These fleets are merely passing by
 	return WarRoleStarNeutral
 }
+
+type SpeciesId uint32
+
+type PopId uint32
+type Pop struct {
+	PlanetId  PlanetId  `sgm:"planet,id"`
+	SpeciesId SpeciesId `sgm:"species,id"`
+	Category  string    `sgm:"category"`
+}

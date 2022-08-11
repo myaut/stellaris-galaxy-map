@@ -42,6 +42,7 @@ type GameState struct {
 	Fleets         map[FleetId]*Fleet                 `sgm:"fleet"`
 	Ships          map[ShipId]*Ship                   `sgm:"ships"`
 	Wars           map[WarId]*War                     `sgm:"war"`
+	Pops           map[PopId]*Pop                     `sgm:"pop"`
 }
 
 func LoadGameState(path string) (*GameState, error) {

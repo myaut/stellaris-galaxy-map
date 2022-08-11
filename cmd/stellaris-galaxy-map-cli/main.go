@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,6 +14,8 @@ import (
 	"github.com/myaut/stellaris-galaxy-map/pkg/sgm"
 	"github.com/myaut/stellaris-galaxy-map/pkg/sgmrender"
 )
+
+var opts sgmrender.RenderOptions
 
 func getSaveLocation() string {
 	homeDir, err := os.UserHomeDir()
@@ -47,18 +50,27 @@ func renderFile(fileName, outFileName string) error {
 		return err
 	}
 
-	r := sgmrender.NewRenderer(state)
+	r := sgmrender.NewRenderer(state, opts)
 	r.Render()
 	return r.Write(outFileName)
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	flag.BoolVar(&opts.ShowSectors, "sectors", false, "show sectors")
+	flag.BoolVar(&opts.NoGrid, "no-grid", false, "hide grid")
+	flag.BoolVar(&opts.NoInsignificantStars, "no-insignificant-stars", false,
+		"hide insignificant stars")
+	flag.BoolVar(&opts.NoHyperLanes, "no-hyperlanes", false, "hide hyperlanes")
+	flag.BoolVar(&opts.NoFleets, "no-fleets", false, "hide fleets")
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) == 0 {
 		runBackground()
 		return
 	}
 
-	fileName := os.Args[1]
+	fileName := args[0]
 	outFileName, err := getOutFileName(fileName)
 	if err != nil {
 		log.Fatal(err)

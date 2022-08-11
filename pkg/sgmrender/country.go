@@ -61,6 +61,7 @@ type countryBorder struct {
 }
 
 type countrySegment struct {
+	id        uint64
 	countryId sgm.CountryId
 
 	flags  countrySegFlag
@@ -74,7 +75,7 @@ type countrySegment struct {
 	cells []*voronoi.Cell
 }
 
-type countryGetter func(s *sgm.Star) sgm.CountryId
+type countryGetter func(s *sgm.Star) (sgm.CountryId, uint64)
 
 type countryRenderer struct {
 	r *Renderer
@@ -130,12 +131,13 @@ func (cr *countryRenderer) buildSegments(getter countryGetter) []*countrySegment
 		}
 
 		starId, star := cr.starByCell(cell)
-		countryId := getter(star)
+		countryId, id := getter(star)
 		if countryId == sgm.DefaultCountryId {
 			continue
 		}
 
 		seg := &countrySegment{
+			id:        id,
 			countryId: countryId,
 			bounds:    sgmmath.NewBoundingRect(),
 			stars: map[sgm.StarId]struct{}{
@@ -192,7 +194,8 @@ func (cr *countryRenderer) buildSegment(
 		if neighCell != nil {
 			neighStarId, neighStar := cr.starByCell(neighCell)
 
-			if getter(neighStar) == seg.countryId && star.IsDistant() == neighStar.IsDistant() {
+			_, neighId := getter(neighStar)
+			if neighId == seg.id && star.IsDistant() == neighStar.IsDistant() {
 				// Recursively walk edges counter-clockwise
 				seg.cells = append(seg.cells, neighCell)
 				seg.stars[neighStarId] = struct{}{}
@@ -325,8 +328,12 @@ func getCountryMapColor(key string, defaultColor string) string {
 
 func (r *Renderer) renderCountries() []countryRenderContext {
 	cr := r.createCountryRenderer()
-	segments := cr.buildSegments(func(s *sgm.Star) sgm.CountryId {
-		return s.Owner()
+	segments := cr.buildSegments(func(s *sgm.Star) (sgm.CountryId, uint64) {
+		ownerId := s.Owner()
+		if r.opts.ShowSectors {
+			return ownerId, uint64(s.SectorId) | (uint64(ownerId) << 32)
+		}
+		return ownerId, uint64(ownerId)
 	})
 	countries := make([]countryRenderContext, 0, len(segments))
 	for _, seg := range segments {
@@ -345,8 +352,9 @@ func (r *Renderer) renderCountries() []countryRenderContext {
 		})
 	}
 
-	occupiedSegs := cr.buildSegments(func(s *sgm.Star) sgm.CountryId {
-		return s.Occupier()
+	occupiedSegs := cr.buildSegments(func(s *sgm.Star) (sgm.CountryId, uint64) {
+		occupierId := s.Occupier()
+		return occupierId, uint64(occupierId)
 	})
 	occupierPatters := make(map[sgm.CountryId]struct{})
 	for _, seg := range occupiedSegs {

@@ -42,8 +42,19 @@ const (
 //go:embed icons/*.svg
 var iconsFS embed.FS
 
+type RenderOptions struct {
+	NoGrid               bool `json:"no_grid"`
+	NoInsignificantStars bool `json:"no_insignificant_stars"`
+	NoHyperLanes         bool `json:"no_hyperlanes"`
+	NoFleets             bool `json:"no_fleets"`
+
+	ShowSectors bool `json:"show_sectors"`
+}
+
 type Renderer struct {
-	state  *sgm.GameState
+	state *sgm.GameState
+	opts  RenderOptions
+
 	doc    *etree.Document
 	canvas *etree.Element
 	defs   *etree.Element
@@ -55,8 +66,8 @@ type Renderer struct {
 	iconCache map[string]*etree.Document
 }
 
-func NewRenderer(state *sgm.GameState) *Renderer {
-	r := &Renderer{state: state}
+func NewRenderer(state *sgm.GameState, opts RenderOptions) *Renderer {
+	r := &Renderer{state: state, opts: opts}
 	r.computeBounds()
 	r.buildStarIndex()
 
@@ -147,6 +158,10 @@ func (r *Renderer) Render() {
 }
 
 func (r *Renderer) renderGrid() {
+	if r.opts.NoGrid {
+		return
+	}
+
 	w, h := r.bounds.Size()
 	gridStepX, gridStepY := w/gridSplit, h/gridSplit
 

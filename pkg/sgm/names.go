@@ -17,6 +17,10 @@ var (
 	EmpireNames             map[string]string
 	SpeciesNames            map[string]string
 	PrescriptedCountryNames map[string]string
+
+	PlanetNames = map[string]string{
+		"PLANET_NAME_FORMAT": "<PARENT> <NUMERAL>",
+	}
 )
 
 //go:embed names/species.yml

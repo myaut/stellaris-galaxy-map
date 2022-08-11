@@ -44,7 +44,9 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 
 		// Render starbase if one exists, otherwise render
 		if (star.PrimaryStarbase() == nil || !star.IsSignificant()) && ctx.battleYear == 0 {
-			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
+			if !r.opts.NoInsignificantStars {
+				r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
+			}
 			continue
 		}
 		stars = append(stars, ctx)
@@ -161,6 +163,10 @@ func (r *Renderer) renderStarFeatures(ctx *starRenderContext) {
 }
 
 func (r *Renderer) renderAllFleets(ctx *starRenderContext) {
+	if r.opts.NoFleets {
+		return
+	}
+
 	allFleets := ctx.star.MobileMilitaryFleets()
 	fleetGroups := make([][]*sgm.Fleet, sgm.WarRoleMax)
 	for _, fleet := range allFleets {
@@ -401,8 +407,11 @@ func (r *Renderer) renderStarText(
 }
 
 func (r *Renderer) renderHyperlanes() {
-	renderedStars := make(map[sgm.StarId]struct{})
+	if r.opts.NoHyperLanes {
+		return
+	}
 
+	renderedStars := make(map[sgm.StarId]struct{})
 	for starId, star := range r.state.Stars {
 		hasRelay := star.HasHyperRelay()
 

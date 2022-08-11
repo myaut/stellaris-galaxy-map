@@ -15,6 +15,7 @@ const (
 
 	PlanetClassEcumenopolis = "pc_city"
 	PlanetClassHabitat      = "pc_habitat"
+	PlanetClassShielded     = "pc_shielded"
 
 	PlanetDesignationCapital = "col_capital"
 
@@ -53,6 +54,7 @@ type Star struct {
 
 	WormholeIds []WormholeId `sgm:"natural_wormholes"`
 	Wormholes   []*Wormhole
+	bypasses    []string
 
 	FleetIds []FleetId `sgm:"fleet_presence"`
 	Fleets   []*Fleet
@@ -114,10 +116,15 @@ func (s *Star) IsOwnedBy(countryId CountryId) bool {
 }
 
 func (s *Star) Bypasses() (bypasses []string) {
+	if s.bypasses != nil {
+		return s.bypasses
+	}
+
 	if len(s.WormholeIds) > 0 {
 		bypasses = append(bypasses, BypassWormhole)
 	}
 
+msLoop:
 	for _, ms := range s.Megastructures {
 		msType, stage := ms.TypeStage()
 		switch msType {
@@ -130,11 +137,20 @@ func (s *Star) Bypasses() (bypasses []string) {
 				bypasses = append(bypasses, BypassGatewayRuined)
 			}
 		case MegastructureHyperRelay:
+			// Skip hyperrelays if both sides have hyper relay with same owner
+			for _, hyperlane := range s.Hyperlanes {
+				if hyperlane.To.Owner() == s.Owner() && hyperlane.To.HasHyperRelay() {
+					continue msLoop
+				}
+			}
+
 			bypasses = append(bypasses, BypassHyperRelay)
 		case MegastructureQuantumCatapult:
 			bypasses = append(bypasses, BypassQuantumCatapult)
 		}
 	}
+
+	s.bypasses = bypasses
 	return bypasses
 }
 
@@ -171,6 +187,10 @@ func (s *Star) MegastructuresBySize(size int) (megastructures []*Megastructure) 
 
 func (s *Star) Colonies(isHabitat bool) (colonies []*Planet) {
 	for _, planet := range s.Planets {
+		if planet.Class == PlanetClassShielded {
+			// continue
+		}
+
 		if planet.EmployablePops > 0 && planet.IsHabitat() == isHabitat {
 			colonies = append(colonies, planet)
 		}
@@ -282,10 +302,8 @@ type PlanetId uint32
 type Planet struct {
 	Star *Star
 
-	NameString string `sgm:"name"`
-	NameStruct struct {
-		Key string `sgm:"key"`
-	} `sgm:"name,struct"`
+	NameString  string `sgm:"name"`
+	NameStruct  Name   `sgm:"name,struct"`
 	Class       string `sgm:"planet_class"`
 	Designation string `sgm:"final_designation"`
 
@@ -294,6 +312,8 @@ type Planet struct {
 
 	OrbitalFleetId FleetId `sgm:"orbital_defence,id"`
 	OrbitalFleet   *Fleet
+
+	OwnerId CountryId `sgm:"owner,id"`
 
 	EmployablePops int `sgm:"employable_pops"`
 }
@@ -306,7 +326,7 @@ func (p *Planet) Name() string {
 	if p.NameString != "" {
 		return p.NameString
 	}
-	return p.NameStruct.Key
+	return p.NameStruct.Format(PlanetNames)
 }
 
 func (p *Planet) OrbitalStarbase() *Starbase {
