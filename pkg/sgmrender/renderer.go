@@ -45,6 +45,7 @@ var iconsFS embed.FS
 type RenderOptions struct {
 	NoGrid               bool `json:"no_grid"`
 	NoInsignificantStars bool `json:"no_insignificant_stars"`
+	NoStarSystems        bool `json:"no_star_systems"`
 	NoHyperLanes         bool `json:"no_hyperlanes"`
 	NoFleets             bool `json:"no_fleets"`
 

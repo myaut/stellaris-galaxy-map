@@ -296,9 +296,7 @@ var DefaultFleetId = FleetId(math.MaxUint32)
 type FleetId uint32
 type Fleet struct {
 	NameString string `sgm:"name"`
-	NameStruct struct {
-		Key string `sgm:"key"`
-	} `sgm:"name,struct"`
+	NameStruct Name   `sgm:"name,struct"`
 
 	Station  bool `sgm:"station"`
 	Mobile   bool `sgm:"mobile"`
@@ -321,7 +319,7 @@ func (f *Fleet) Name() string {
 	if f.NameString != "" {
 		return f.NameString
 	}
-	return f.NameStruct.Key
+	return f.NameStruct.Format(CountryNameFormats)
 }
 
 func (fleet *Fleet) IsTransport() bool {

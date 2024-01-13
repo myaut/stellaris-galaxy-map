@@ -35,6 +35,12 @@ var empireNamesText string
 //go:embed names/empire_formats.yml
 var countryNameFormatsText string
 
+const (
+	NewFormatAdj1      = "%ADJECTIVE%"
+	NewFormatAdj2      = "%ADJ%"
+	NewFormatKeyAppend = "1"
+)
+
 type NameVariable struct {
 	Key   string `sgm:"key"`
 	Value Name   `sgm:"value"`
@@ -46,19 +52,50 @@ type Name struct {
 }
 
 func (n *Name) Format(formatNames map[string]string) string {
-	format, ok := formatNames[n.Key]
-	if !ok {
-		return n.Resolve()
+	var components []string
+	var seekAdjective bool
+	switch n.Key {
+	case NewFormatAdj1:
+		seekAdjective = true
+		fallthrough
+	case NewFormatAdj2, NewFormatKeyAppend:
+		for _, v := range n.Variables {
+			switch v.Key {
+			case "adjective":
+				if seekAdjective {
+					components = append([]string{v.Value.Resolve()}, components...)
+				}
+			case NewFormatKeyAppend:
+				components = append(components, v.Value.Format(formatNames))
+			default:
+				components = append(components, v.Key)
+			}
+		}
+	default:
+		var noSubstitute bool
+		if format, ok := formatNames[n.Key]; ok {
+			components = []string{format}
+		} else {
+			components = []string{n.Resolve()}
+			noSubstitute = true
+		}
+
+		for _, v := range n.Variables {
+			if v.Key == NewFormatKeyAppend {
+				components = append(components, v.Value.Format(formatNames))
+				continue
+			} else if noSubstitute {
+				continue
+			}
+
+			// TODO: deduce name map
+			sub := v.Value.Format(DefaultNames)
+			components[0] = strings.ReplaceAll(components[0], "<"+v.Key+">", sub)
+			components[0] = strings.ReplaceAll(components[0], "["+v.Key+"]", sub)
+		}
 	}
 
-	for _, v := range n.Variables {
-		// TODO: deduce name map
-		sub := v.Value.Format(DefaultNames)
-		format = strings.ReplaceAll(format, "<"+v.Key+">", sub)
-		format = strings.ReplaceAll(format, "["+v.Key+"]", sub)
-	}
-
-	return format
+	return strings.Join(components, " ")
 }
 
 func (n *Name) Resolve() string {

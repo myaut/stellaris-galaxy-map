@@ -39,6 +39,10 @@ func (r *Renderer) renderStars() (stars []*starRenderContext) {
 		p := star.Point()
 		ctx.g = r.canvas.CreateElement("g")
 		ctx.g.CreateAttr("transform", fmt.Sprintf("translate(%f, %f)", p.X, p.Y))
+		if r.opts.NoStarSystems {
+			r.createPath(ctx.g, defaultStarStyle, defaultStarPath)
+			continue
+		}
 
 		ctx.battleYear, ctx.battleRef = r.findBattle(star)
 
@@ -278,16 +282,9 @@ func (r *Renderer) renderMegastructure(
 func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, planet *sgm.Planet) {
 	radius := float64(iconSizeMd) / 2
 	center := point.Add(sgmmath.Point{radius, radius})
+	ringRadius := radius
 
 	strokeWidth := 0.4
-	iconPoint := point
-	if planet.OrbitalStarbase() != nil {
-		r.createCircle(ctx.g, planetRingStyle, center, radius)
-
-		strokeWidth -= 0.2
-		radius -= 0.6
-		iconPoint = iconPoint.Add(sgmmath.Point{0.6, 0.6})
-	}
 
 	switch {
 	case planet.EmployablePops > 50:
@@ -314,6 +311,13 @@ func (r *Renderer) renderPlanet(ctx *starRenderContext, point sgmmath.Point, pla
 	}
 	if planet.Class == sgm.PlanetClassEcumenopolis {
 		r.createIcon(ctx.g, point, "colony-ecumenopolis", iconSizeMd)
+	}
+
+	if planet.OrbitalStarbase() != nil {
+		g := ctx.g.CreateElement("g")
+		g.CreateAttr("transform",
+			fmt.Sprintf("translate(%f, %f)", center.X, center.Y))
+		r.createPath(g, planetRingStyle, newOrbitalRingPath(ringRadius))
 	}
 }
 

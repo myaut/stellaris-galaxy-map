@@ -60,6 +60,8 @@ func main() {
 	flag.BoolVar(&opts.NoGrid, "no-grid", false, "hide grid")
 	flag.BoolVar(&opts.NoInsignificantStars, "no-insignificant-stars", false,
 		"hide insignificant stars")
+	flag.BoolVar(&opts.NoStarSystems, "no-star-systems", false,
+		"hide star systems: planets, starbases")
 	flag.BoolVar(&opts.NoHyperLanes, "no-hyperlanes", false, "hide hyperlanes")
 	flag.BoolVar(&opts.NoFleets, "no-fleets", false, "hide fleets")
 	flag.Parse()

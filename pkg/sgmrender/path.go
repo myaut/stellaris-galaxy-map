@@ -48,9 +48,23 @@ func newFleetPath(size, off float64) Path {
 		LineTo(size-off, -size/3.0+off).Complete()
 }
 
+// 0,0.5 1,1 2,1 1,0 2,-0.5 2,-1
+func newOrbitalRingPath(r float64) Path {
+	return NewPath().MoveTo(-r, 0.0).
+		CurveDiff([]sgmmath.Point{
+			{X: 0, Y: r / 4},
+			{X: r / 2, Y: r / 2},
+			{X: r, Y: r / 2},
+			{X: r / 4, Y: 0},
+			{X: r, Y: -r / 4},
+		}, r, -r/2)
+}
+
 type PathElement struct {
 	Command rune
-	X, Y    float64
+	sgmmath.Point
+
+	Points []sgmmath.Point
 }
 
 type Path struct {
@@ -67,7 +81,8 @@ func NewVectorPath(vec sgmmath.Vector) Path {
 }
 
 func (p Path) MoveTo(x, y float64) Path {
-	return Path{path: append(p.path, PathElement{Command: 'M', X: x, Y: y})}
+	return Path{path: append(p.path,
+		PathElement{Command: 'M', Point: sgmmath.Point{X: x, Y: y}})}
 }
 
 func (p Path) MoveToPoint(point sgmmath.Point) Path {
@@ -75,7 +90,8 @@ func (p Path) MoveToPoint(point sgmmath.Point) Path {
 }
 
 func (p Path) LineTo(x, y float64) Path {
-	return Path{path: append(p.path, PathElement{Command: 'L', X: x, Y: y})}
+	return Path{path: append(p.path,
+		PathElement{Command: 'L', Point: sgmmath.Point{X: x, Y: y}})}
 }
 
 func (p Path) LineToPoint(point sgmmath.Point) Path {
@@ -83,11 +99,22 @@ func (p Path) LineToPoint(point sgmmath.Point) Path {
 }
 
 func (p Path) HorLine(x float64) Path {
-	return Path{path: append(p.path, PathElement{Command: 'H', X: x})}
+	return Path{path: append(p.path,
+		PathElement{Command: 'H', Point: sgmmath.Point{X: x}})}
 }
 
 func (p Path) VertLine(y float64) Path {
-	return Path{path: append(p.path, PathElement{Command: 'V', Y: y})}
+	return Path{path: append(p.path,
+		PathElement{Command: 'V', Point: sgmmath.Point{Y: y}})}
+}
+
+func (p Path) CurveDiff(points []sgmmath.Point, dx, dy float64) Path {
+	return Path{path: append(p.path,
+		PathElement{
+			Command: 'c',
+			Points:  points,
+			Point:   sgmmath.Point{X: dx, Y: dy},
+		})}
 }
 
 func (p Path) Complete() Path {
@@ -120,6 +147,11 @@ func (p *Path) String() string {
 				fmt.Fprintf(buf, "%f", el.Y)
 			case 'Z':
 				// Z has no options
+			case 'c':
+				for _, point := range el.Points {
+					fmt.Fprintf(buf, "%f,%f ", point.X, point.Y)
+				}
+				fmt.Fprintf(buf, "%f,%f", el.X, el.Y)
 			}
 		}
 		p.s = buf.String()
